@@ -18,4 +18,9 @@ private:
 
 	Game_Manager game_manager;
 
+	String go_scene;
+
+	bool once_initialize = false;
+
+
 };

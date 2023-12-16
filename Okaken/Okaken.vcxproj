@@ -115,16 +115,28 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Block_Manager.cpp" />
+    <ClCompile Include="Function_Fade.cpp" />
+    <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Music.cpp" />
+    <ClCompile Include="My_Effect.cpp" />
+    <ClCompile Include="Shop.cpp" />
+    <ClCompile Include="Update_Ev.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game_Manager.cpp" />
+    <ClCompile Include="Initialize.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Make_Enemy.cpp" />
+    <ClCompile Include="Make_Shot_Enemy.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Save_Load.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Update_Ev_State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\engine\texture\box-shadow\128.png" />
@@ -320,16 +332,59 @@
     <Xml Include="App\example\xml\test.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Area_Data.hpp" />
+    <ClInclude Include="Area_Map.hpp" />
+    <ClInclude Include="Bake.hpp" />
     <ClInclude Include="Block.hpp" />
-    <ClInclude Include="Block_Manager.hpp" />
     <ClInclude Include="Block_Type.hpp" />
+    <ClInclude Include="Bound_Block.hpp" />
+    <ClInclude Include="Break_Block.hpp" />
+    <ClInclude Include="Bullet_Enemy.hpp" />
+    <ClInclude Include="Cleaner.hpp" />
+    <ClInclude Include="Cur.hpp" />
+    <ClInclude Include="Deco.hpp" />
+    <ClInclude Include="Detail_Setter.hpp" />
+    <ClInclude Include="Equip_Charm.hpp" />
+    <ClInclude Include="Event.hpp" />
+    <ClInclude Include="Event_List.hpp" />
+    <ClInclude Include="Event_Super.hpp" />
+    <ClInclude Include="Have_Charm.hpp" />
     <ClInclude Include="Common.hpp" />
+    <ClInclude Include="Define.hpp" />
+    <ClInclude Include="Editor_Grid.hpp" />
+    <ClInclude Include="Enemy.hpp" />
+    <ClInclude Include="Enemy_list.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Game_Manager.hpp" />
+    <ClInclude Include="Have_Item.hpp" />
+    <ClInclude Include="Hitotume.hpp" />
+    <ClInclude Include="Indent_Drawer.hpp" />
+    <ClInclude Include="Item.hpp" />
+    <ClInclude Include="Kasa.hpp" />
+    <ClInclude Include="Memo.hpp" />
+    <ClInclude Include="Message_Box.hpp" />
+    <ClInclude Include="Move_Floor.hpp" />
+    <ClInclude Include="My_Button.hpp" />
+    <ClInclude Include="My_Effect.hpp" />
+    <ClInclude Include="My_Slider.hpp" />
     <ClInclude Include="One_Way_Floor.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Area_Selecter.hpp" />
+    <ClInclude Include="Red_Effect.hpp" />
+    <ClInclude Include="Select_Box.hpp" />
+    <ClInclude Include="Slip_Block.hpp" />
+    <ClInclude Include="Stage_Data.hpp" />
+    <ClInclude Include="Status.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Stick.hpp" />
+    <ClInclude Include="Tem.hpp" />
+    <ClInclude Include="Text_Data.hpp" />
+    <ClInclude Include="Tile.hpp" />
     <ClInclude Include="Title.hpp" />
+    <ClInclude Include="Needle.hpp" />
+    <ClInclude Include="Tool_Selecter.hpp" />
+    <ClInclude Include="Tyoutin.hpp" />
+    <ClInclude Include="White_Effect.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App\example\obj\blacksmith.obj">
