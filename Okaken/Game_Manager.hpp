@@ -13,6 +13,7 @@
 #include"Bullet_Enemy.hpp"
 
 #include"My_Effect.hpp"
+#include"Circle_Effect.hpp"
 
 //ブロックタイプ
 #include"Block_Type.hpp"
@@ -47,6 +48,8 @@
 
 //Action
 #include"Stick.hpp"//お祓い棒クラス
+#include"Jump_Effect.hpp"
+#include"Dash_Effect.hpp"
 
 //Menu
 #include"Message_Box.hpp"
@@ -66,6 +69,9 @@
 
 //Shader
 #include"White_Effect.hpp"
+
+//Other
+#include"Light_Bloom.hpp"
 
 
 class Game_Manager {
@@ -232,14 +238,128 @@ private:
 	Player player;
 	void draw_player()const {
 
-		const ScopedCustomShader2D shader{ psRed };
+		//プレイヤーと点滅表示
+		{
 
-		cbRed->strength = player.get_red();
+			const ScopedCustomShader2D shader{ psRed };
 
-		Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbRed);
+			cbRed->strength = player.get_red();
 
-		player.draw();
+			Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbRed);
+
+			player.draw();
+		}
+
+		
 	}
+
+
+	//別のスクロールで描画(別のレンダーテクスチャを使うので)
+	void draw_player_light()const {
+
+		if (player.get_violet()>0) {
+
+
+			{
+				{
+					auto t = camera.createTransformer();
+
+					ScopedLightBloom target{ light_bloom };
+
+					draw_player_violet();
+				}
+
+				light_bloom.draw(player.get_violet());
+
+			}
+		}
+	}
+
+	void draw_player_violet()const {
+
+		{
+
+			const ScopedCustomShader2D shader{ psViolet };
+
+			cbViolet->strength = 1;
+
+			Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
+
+			player.draw();
+		}
+	}
+
+	void draw_dash_effect_light()const {
+
+
+		for (auto& effect : dash_effects) {
+
+			{
+				auto t = camera.createTransformer();
+
+				ScopedLightBloom target{ light_bloom };
+
+				{
+					const ScopedCustomShader2D shader{ psViolet };
+
+					cbViolet->strength = 1;
+
+					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
+
+					effect.draw();
+				}
+
+			}
+
+			light_bloom.draw(player.get_violet());
+		}
+
+	}
+
+	void draw_jump_effect_light()const {
+
+		for (auto& effect : jump_effects) {
+
+			{
+				auto t = camera.createTransformer();
+
+				ScopedLightBloom target{ light_bloom };
+
+				{
+					const ScopedCustomShader2D shader{ psViolet };
+
+					cbViolet->strength = 1;
+
+					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
+
+					effect.draw();
+				}
+
+			}
+
+			light_bloom.draw(player.get_violet());
+		}
+	}
+
+	//使用しない
+	void draw_dash_effect_violet()const {
+
+		{
+			
+			const ScopedCustomShader2D shader{ psViolet };
+
+			cbViolet->strength = 1;
+
+			Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
+
+			draw_dash_effects();
+
+		
+		}
+	}
+
+	LightBloom light_bloom;
+	
 	
 
 	void damage_player(int v,String direction) {
@@ -254,12 +374,14 @@ private:
 					player.set_knock_back(direction);
 				}
 
+
 				status.minus_life(1);
+				status.minus_power(1);
 
 				hp_white_lock_count = 0.5;
 				damage_layer_count = 1.2;
 
-
+				
 			}
 		}
 	}
@@ -267,7 +389,93 @@ private:
 	void full_life_player() {
 		status.full_life();
 	}
-	
+
+	Array<Jump_Effect> jump_effects;
+
+	void update_jump_effects(float d_time) {
+
+		if (true==player.get_just_double()) {
+
+			float x = player.get_rect().x + player.get_rect().w / 2;
+			float y = player.get_rect().y + player.get_rect().h;
+
+			jump_effects.push_back(Jump_Effect(x - 75, y));
+		}
+
+		for (auto& effect : jump_effects) {
+			effect.update(d_time);
+		}
+
+
+		jump_effects.remove_if([&](Jump_Effect effect) {
+
+			if (true == effect.get_delete()) {
+				return true;
+			}
+
+		return false;
+
+			});
+	}
+
+	void draw_jump_effects()const {
+
+		for (auto& effect : jump_effects) {
+			effect.draw();
+		}
+	}
+
+	Array<Dash_Effect> dash_effects;
+
+	void update_dash_effects(float d_time) {
+
+		if (true == player.get_dash()) {
+
+			float x = player.get_rect().x;
+			float y = player.get_rect().y + player.get_rect().h / 2;
+
+			if (player.get_dash_count() > player.get_dash_effect_count()*0.16) {
+
+				//Print << U"count::" << player.get_dash_count();
+
+				if (player.get_direction() == U"left") {
+
+					dash_effects.push_back(Dash_Effect(x, y - 30, true));
+				}
+				else if (player.get_direction() == U"right") {
+
+					dash_effects.push_back(Dash_Effect(x + (74 - 80), y - 30, false));
+				}
+
+				player.plus_dash_effect_count();
+			}
+
+			
+		}
+
+		for (auto& effect : dash_effects) {
+			effect.update(d_time);
+		}
+
+
+		dash_effects.remove_if([&](Dash_Effect effect) {
+
+			if (true == effect.get_delete()) {
+				return true;
+			}
+
+		return false;
+
+			});
+	}
+
+	void draw_dash_effects()const {
+
+		for (auto& effect : dash_effects) {
+			effect.draw();
+		}
+	}
+
 
 	//Tile
 	Array<Tile> tiles;
@@ -377,6 +585,13 @@ private:
 				int drop_coin_500 = enemy->get_drop_coin_500();
 
 				make_items(drop_heart, drop_soul, drop_coin_10, drop_coin_50, drop_coin_100, drop_coin_500, center_x, center_y);
+
+				circle_effects.push_back(Circle_Effect({ center_x,center_y }, 60, ColorF(0.93,0.5,0.93)));
+
+				for (int i = 0; i < 5; i++) {
+					circle_effects.push_back(Circle_Effect({ center_x,center_y }, 30, ColorF(0.93, 0.5, 0.93), float(72 * i) - 90));
+				}
+
 
 				return true;
 			}
@@ -577,6 +792,29 @@ private:
 			});
 	}
 
+	Array<Circle_Effect> circle_effects;
+	void update_circle_effects(const float d_time) {
+		for (auto& effect : circle_effects) {
+			effect.update(d_time);
+		}
+	}
+	void draw_circle_effects()const {
+		for (auto& effect : circle_effects) {
+			effect.draw();
+		}
+	}
+	void delete_circle_effects() {
+
+		circle_effects.remove_if([&](Circle_Effect effect) {
+
+			if (effect.get_delete()) {
+				return true;
+			}
+
+		return false;
+
+			});
+	}
 
 	//Change
 	
@@ -766,15 +1004,53 @@ private:
 	//Action
 	Stick stick;
 
+	
+
 	void attack() {
 
-		if (KeyX.down() and false == player.get_action_lock() and false==game_over_flag) {
+		if (KeyX.down() and false == player.get_action_lock() and false==game_over_flag and player.get_attack()) {
 
 			String direction = player.get_direction();
-			float x = player.get_rect().x + player.get_rect().w / 2;
-			float y = player.get_rect().y + player.get_rect().h / 2;
+			float x = 0;
+			float y = 0;
+
+			/*
+			if (direction == U"left") {
+				x = player.get_rect().x;
+			}
+			else if (direction == U"right") {
+				x = player.get_rect().x + player.get_rect().w;
+			}*/
+
+			x = player.get_rect().x + player.get_rect().w / 2;
+
+			y = player.get_rect().y;
 
 			stick.make_attack(direction, x, y);
+
+
+			player.set_attack_cool_time();
+		}
+
+		if (stick.get_exist()) {
+
+			float x = 0;
+			float y = 0;
+
+			x = player.get_rect().x + player.get_rect().w / 2;
+
+			y = player.get_rect().y;
+
+			stick.set_pos(x,y);
+
+
+			//プレイヤーの描画用
+
+			player.set_state(U"attack");
+
+			int page = stick.get_page();
+			player.set_attack_page(page);
+
 		}
 	}
 
@@ -1077,6 +1353,15 @@ private:
 		}
 	}
 
+	void minus_will_money(int v) {
+
+		will_money_minus += v;
+
+		if (0 == will_money_scene) {
+			will_money_scene = 3;
+			
+		}
+	}
 
 
 	//UI処理
@@ -1092,8 +1377,12 @@ private:
 
 	float will_money_count = 0;
 
+	//UI処理お金減らす
+
+	int will_money_minus = 0;//減算分
 
 	float purse_display_count = 0;
+
 
 
 
@@ -1109,7 +1398,7 @@ private:
 		if (0 == will_money_scene) {
 
 		}
-		//開始処理
+		//開始処理(増加)
 		else if (1 == will_money_scene) {
 
 			//実行中
@@ -1171,6 +1460,82 @@ private:
 			}
 
 		}
+
+
+		//開始処理(減少)
+		else if (3 == will_money_scene) {
+
+			//実行中
+			process = true;
+
+			//財布の描画カウント維持
+			purse_display_count = keep_count;
+
+			//初期値を取得
+			will_money_base = status.get_money();
+
+			//減少結果を計算
+			will_money_goal = will_money_base - will_money_minus;
+
+			//バグ除け
+			if (will_money_goal < 0) {
+				throw Error{U"your_money_is_under_0_from_Game_Manager.hpp"};
+			}
+
+			//１回当たりの増加量を計算
+			//will_money_split = will_money / 60 / 3;
+
+			//カウンターをリセット
+			will_money_count = 0;
+
+			will_money_scene++;
+
+			Print << U"pass";
+		}
+		else if (4 == will_money_scene) {
+
+			//実行中
+			process = true;
+
+			//財布の描画カウント維持
+			purse_display_count = keep_count;
+
+
+			//更新(お金が処理中に増加した場合にも対応)
+			//増加結果を再計算
+			will_money_goal = will_money_base - will_money_minus;
+
+			//バグ除け
+			if (will_money_goal < 0) {
+				Error{ U"your_money_is_under_0_from_Game_Manager.hpp" };
+			}
+
+			//Print << U"will_money_goal::" << will_money_goal;
+
+			//カウンター増加
+			will_money_count += d_time;
+
+			if (will_money_count >= float(1 / 60)) {
+
+				int v = 1;
+
+				status.minus_money(v);
+				will_money_count = 0;
+			}
+
+			//目標値まで減少した(終了処理)
+			if (status.get_money() <= will_money_goal) {
+
+				status.set_money(will_money_goal);
+
+				will_money_scene = 0;
+				will_money_minus = 0;
+				will_money_goal = 0;
+			}
+		}
+
+
+
 
 		//実行していないとき
 		if (purse_display_count > 0) {
@@ -1287,7 +1652,7 @@ private:
 
 		//Print << U"fade::"<<fade;
 
-		if (U"menu" == scene) {
+		if (U"menu" == scene or ev_shop) {
 			fade = 1;
 		}
 
@@ -1587,6 +1952,37 @@ private:
 
 	int menu_layer = 0;
 
+	void update_show_quick_map() {
+
+		show_quick_map = false;
+
+		if (false == game_over_flag and false == player.get_action_lock()) {
+
+			if (KeyShift.pressed()) {
+				show_quick_map = true;
+			}
+		}
+	}
+
+	void draw_show_quick_map()const {
+
+		if (true == show_quick_map) {
+
+			Rect black(0, 0, 1920, 1080);
+
+			float size = 0.8;
+
+			int adjust_x = 1920 * (1-size) / 2;
+			int adjust_y = 1080 * (1-size) / 2;
+
+			black.draw(ColorF(0,0,0, 0.6));
+
+			TextureAsset(U"map_all").scaled(size).draw(0 + adjust_x, 0 + adjust_y);
+		}
+	}
+
+	bool show_quick_map = false;
+
 
 	void go_menu_scene(int go_layer,String go_plus_scene) {
 		initialize_fade();
@@ -1679,6 +2075,9 @@ private:
 
 	PixelShader psRed;
 	mutable ConstantBuffer<WhiteEffectConstants> cbRed;
+
+	PixelShader psViolet;
+	mutable ConstantBuffer<WhiteEffectConstants> cbViolet;
 
 	//GameOver
 	bool game_over_flag = false;
@@ -1801,6 +2200,15 @@ private:
 
 	Cur shop_cur;
 
+	String shop_select = U"";
+	int shop_price = 0;
+
+	int shop_scene = 0;
+
+	int shop_cur_yes_no = 0;
+
+	float shop_bought_count = 0;
+
 	struct Shop_Goods {
 
 		Shop_Goods(String set_name,int set_price,int set_x,int set_y) {
@@ -1814,6 +2222,8 @@ private:
 		int price = 0;
 		int x = 0;
 		int y = 0;
+
+		String text = U"";
 	};
 
 	Array<Shop_Goods> shop_goods;
@@ -1822,5 +2232,16 @@ private:
 
 		shop_goods.push_back(Shop_Goods(set_name, set_price, set_x, set_y));
 	}
+
+	void set_shop_goods_text(String name,String set_text) {
+
+		for (auto& goods : shop_goods) {
+			if (name == goods.name) {
+				goods.text = set_text;
+				break;
+			}
+		}
+	}
+
 
 };

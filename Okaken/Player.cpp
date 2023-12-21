@@ -79,6 +79,38 @@ void Player::reset() {
 	red_count = 0;
 	red_count_2 = 12;
 
+	//2段ジャンプ
+	jump_count = 0;
+
+
+	//注意！！debug用
+	can_double_jump = true;
+
+	just_double_jump = false;
+
+
+	direction_lock = false;
+
+	display_stick = true;
+
+	//アタック
+	attack_count = 0;
+
+	attack_page = 0;
+
+	//ダッシュエフェクト
+	be_dash = false;
+
+	dash_count = 0;
+
+	dash_effect_count = 0;
+
+	//紫
+	violet = 0;
+
+	//歩行アニメ
+	walk_page = 0;
+	walk_count = 0;
 }
 
 
@@ -93,6 +125,22 @@ void Player::update(float d_time) {
 	action_lock = false;
 	if (game_over_flag == true or knock_back == true) {
 		action_lock = true;
+	}
+
+	//stateを初期化
+	m_state = U"wait";
+
+	//攻撃
+	if (attack_count > 0) {
+		attack_count -= m_d_time;
+	}
+
+	//攻撃中は向き変更できない
+	direction_lock = false;
+	if (attack_count > 0) {
+		//move_lock = true;
+		//m_speed.x = 0;
+		direction_lock = true;
 	}
 
 	if (false == knock_back) {
@@ -112,31 +160,113 @@ void Player::update(float d_time) {
 	update_muteki();
 
 	update_camera();
+
+
+	//ダッシュエフェクト減らす
+	if (violet > 0) {
+		violet -= m_d_time * (1 / 0.5);
+		//violet -= m_d_time * 0.1;
+	}
 }
 
 void Player::draw()const {
 
 	//get_rect().draw(Palette::Red);
 
-	String image_name = U"";
+	String image_name = U"player_";
 
+	image_name += m_state;
 
-
+	/*
 	if (U"wait" == m_state) {
 
-		image_name = U"player_wait";
+		image_name += U"wait";
 
 	}
+	else if (U""==m_state) {
 
+		image_name += U"";
+	}*/
+
+	if (U"attack" == m_state) {
+		image_name += U"_" + Format(attack_page);
+	}
+
+	 adjust_x = 0;
+	 adjust_y = 150 - 200;
 
 	if (U"left" == m_direction) {
-		TextureAsset(image_name).draw(m_pos);
+
+		adjust_x = 74 - 247;
+
+		TextureAsset(image_name).draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
 	}
 	else if (U"right" == m_direction) {
-		TextureAsset(image_name).mirrored().draw(m_pos);
+
+		adjust_x = 0;
+
+		TextureAsset(image_name).mirrored().draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
 	}
 
-	
+
+	//プレイヤーの足
+	String image_under = U"player_under_";
+
+	if (true == m_is_ground) {
+
+		if (0 == walk_page) {
+			image_under += U"wait";
+		}
+		else {
+			image_under += U"walk_" + Format(walk_page);
+		}
+
+	}
+	//jump
+	else {
+		image_under += U"jump";
+	}
+
+	if (U"left" == m_direction) {
+
+		TextureAsset(image_under).draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
+	}
+	else if (U"right" == m_direction) {
+
+		TextureAsset(image_under).mirrored().draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
+	}
+
+}
+
+void Player::draw_stick()const {
+
+	//お祓い棒表示
+	if (true == display_stick) {
+
+		String stick_image = U"stick_";
+
+
+		bool mirror = false;
+
+		if (U"wait" == m_state) {
+
+			stick_image += U"wait";
+		}
+		else if (U"attack" == m_state) {
+
+			stick_image += Format(attack_page);
+		}
+
+		if (U"left" == m_direction) {
+
+		}
+		else if (U"right" == m_direction) {
+
+			mirror = true;
+		}
+
+		TextureAsset(stick_image).mirrored(mirror).draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
+	}
 }
 
 void Player::walk() {
@@ -146,15 +276,33 @@ void Player::walk() {
 		// 平滑化時間（小さいと速く目標値 (0.0) に近づく）
 		const double smoothTime = 0.05;
 
-		if (KeyLeft.pressed() and false==action_lock)
+		if (KeyLeft.pressed() and false==action_lock )
 		{
-			m_speed.x -= (m_walk_speed * m_d_time);
-			m_direction = U"left";
+			bool lock = false;
+
+			//方向転換をロック
+			if (true == direction_lock and U"right" == m_direction) {
+				lock = true;
+			}
+
+			if (false == lock) {
+				m_speed.x -= (m_walk_speed * m_d_time);
+				m_direction = U"left";
+			}
 		}
 		else if (KeyRight.pressed() and false==action_lock)
 		{
-			m_speed.x += (m_walk_speed * m_d_time);
-			m_direction = U"right";
+			bool lock = false;
+
+			//方向転換をロック
+			if (true == direction_lock and U"left" == m_direction) {
+				lock = true;
+			}
+
+			if (false == lock) {
+				m_speed.x += (m_walk_speed * m_d_time);
+				m_direction = U"right";
+			}
 		}
 		else
 		{
@@ -191,6 +339,32 @@ void Player::walk() {
 
 	//滑り判定
 	m_slip = false;
+
+	//歩行アニメ
+
+	
+
+	if (abs(m_speed.x) * m_d_time >= 2) {
+
+		walk_count += abs(m_speed.x) * m_d_time;
+
+		if (walk_count >= walk_page * 45) {
+
+			walk_page++;
+
+			if (6 == walk_page) {
+				walk_page = 0;
+				walk_count = 0;
+			}
+		}
+	}
+	else {
+		
+		walk_page = 0;
+		walk_count = 0;
+	}
+
+	
 }
 
 void Player::function_gravity() {
@@ -203,8 +377,19 @@ void Player::jump() {
 
 	bool can_jump = false;
 
+	just_double_jump = false;
+
+	//地面に着いたら
 	if (true == m_is_ground) {
-		can_jump = true;
+		//can_jump = true;
+		jump_count = 0;
+	}
+
+	//2段ジャンプできるなら
+	if (true == can_double_jump) {
+		if (jump_count < 2) {
+			can_jump = true;
+		}
 	}
 
 	//コヨーテタイム
@@ -232,6 +417,7 @@ void Player::jump() {
 					m_jump_buffering_scene++;
 					m_jump_buffering = m_jump_buffering_count;
 					m_jump_buffering_triger = true;//自動ジャンプする
+
 				}
 			}
 			else if (2 == m_jump_buffering_scene) {//入力中
@@ -271,13 +457,21 @@ void Player::jump() {
 				}
 			}
 
+			//ジャンプの処理
 			if (false == high_jump) {
 				m_speed.y = m_jump_speed;
 			}
 			else if (true == high_jump) {
 				m_speed.y = m_jump_speed * 1.3;
 			}
-			
+
+			jump_count++;
+
+			if (2 == jump_count) {
+
+				just_double_jump = true;
+				violet = 1;
+			}
 
 			jump_common();
 		}
@@ -286,6 +480,7 @@ void Player::jump() {
 	
 
 	//壁キック
+
 
 	if (false == m_is_ground) {
 
@@ -305,6 +500,12 @@ void Player::jump() {
 					jump_common();
 					m_speed.x = -500;
 				}
+
+				jump_count = 1;
+
+				//2段ジャンプ解除
+				just_double_jump = false;
+				violet = 0;
 			}
 		}
 	}
@@ -330,6 +531,8 @@ void Player::jump() {
 				}
 
 				m_dash_scene++;
+
+				be_dash = true;
 			}
 		}
 
@@ -337,6 +540,9 @@ void Player::jump() {
 	if (1 == m_dash_scene) {
 
 		float dash_speed = 1200;
+
+		//ダッシュエフェクト用
+		dash_count += m_d_time;
 
 		if (U"left" == m_dash) {
 			m_pos.x -= dash_speed * m_d_time;
@@ -372,10 +578,19 @@ void Player::jump() {
 			m_speed.y = 0;
 
 			m_dash_cool_time = 0.4;
+
+			//Dash_Effect
+			dash_count = 0;
+			be_dash = false;
+			dash_effect_count = 0;
 		}
 
 	}
-	
+
+	//ダッシュ中発光
+	if (be_dash == true) {
+		violet = 1;
+	}
 	
 	
 
@@ -401,6 +616,9 @@ void Player::jump() {
 	m_wall_direction = U"none";
 	//バウンド
 	m_bound = false;
+
+
+	
 }
 
 

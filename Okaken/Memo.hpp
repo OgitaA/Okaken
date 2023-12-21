@@ -4,6 +4,8 @@
 
 //Curにもdeltatime変更
 
+//Shopの数が３以下など
+
 #include<Siv3D.hpp>
 
 class Object {

@@ -10,6 +10,7 @@ public:
 
 	void update(float);
 	void draw()const;
+	void draw_stick()const;
 
 	void walk();
 	void jump();
@@ -61,6 +62,8 @@ public:
 		m_jump_buffering_scene = 0;
 		m_jump_buffering_triger = false;
 		m_now_jump = false;
+
+	
 	}
 
 	//カメラ用
@@ -157,14 +160,14 @@ public:
 		m_speed = { 0,0 };
 
 		//上に飛ばす
-		m_speed.y = -1000;
+		m_speed.y = -800;
 
 		if (direction == U"left") {
-			m_speed.x = -2000;
+			m_speed.x = -2300;
 
 		}
 		else if (direction == U"right") {
-			m_speed.x = 2000;
+			m_speed.x = 2300;
 		}
 
 	}
@@ -233,6 +236,34 @@ public:
 	}
 
 	bool get_action_lock() { return action_lock; }
+
+	bool get_attack() {
+
+		if (attack_count <= 0) {
+			return true;
+		}
+		return false;
+	}
+
+	void set_attack_cool_time() { attack_count = 0.35; }
+
+	void set_state(String set_v) {
+
+		m_state = set_v;
+	}
+
+	void set_attack_page(int set_v) {
+		attack_page = set_v;
+	}
+
+	bool get_just_double() { return just_double_jump; }
+
+	bool get_dash()const { return be_dash; }
+	float get_dash_count() { return dash_count; }
+	int get_dash_effect_count() { return dash_effect_count; }
+	void plus_dash_effect_count() { dash_effect_count++; }
+
+	float get_violet()const { return violet; }
 
 	//debug用
 	void reset_pos() { m_pos = { 1920 / 2,800 }; }
@@ -341,4 +372,51 @@ private:
 
 	//操作ロック
 	bool action_lock = false;
+
+	//2段ジャンプ
+	int jump_count = 0;
+
+	bool can_double_jump = true;
+
+	//２段ジャンプエフェクト
+	bool just_double_jump = false;
+
+	//アタックカウント
+	float attack_count = 0;
+
+	//アタック中向き変更封じる
+	bool direction_lock = false;
+
+	//お祓い棒表示
+	bool display_stick = true;
+
+	//アタック段階
+	int attack_page = 0;
+
+	struct Stick {
+
+		Vec2 pos;
+		String name;
+	};
+
+	//ダッシュエフェクト
+	bool be_dash = false;
+
+	float dash_count = 0;
+	int dash_effect_count = 0;
+
+	//通常画像処理
+	mutable int adjust_x = 0;
+	mutable int adjust_y = 0;
+
+	//紫発光
+	float violet = 0;
+
+	//歩行アニメ
+	int walk_page = 0;
+
+	//歩行アニメカウント
+	float walk_count = 0;
+
+
 };

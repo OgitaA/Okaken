@@ -15,7 +15,7 @@ public:
 		adjust_w = 72;
 		adjust_h = 72;
 
-		m_hp = 3;
+		m_hp = 30;
 
 		m_drop_heart = 1;
 		m_drop_soul = 1;

@@ -86,10 +86,18 @@ public:
 	//Money
 
 	int get_money()const {return m_money; }
+
 	void plus_money(int v) {
 		m_money += v;
 		if (m_money > m_money_max) {
 			m_money = m_money_max;
+		}
+	}
+
+	void minus_money(int v) {
+		m_money -= v;
+		if (m_money < 0) {
+			m_money = 0;
 		}
 	}
 
@@ -565,8 +573,15 @@ public:
 
 	
 
+	//Shop_Solds
 
+	Array<String> get_shop_solds(){
+		return shop_solds;
+	}
 
+	void plus_shop_solds(String data) {
+		shop_solds.push_back(data);
+	}
 
 	
 
@@ -590,10 +605,11 @@ private:
 	Array<Have_Weapon> have_weapons;
 	Array<Have_Item> have_items;
 
+	Array<String> shop_solds;
 
 	template <class Archive>
 	void SIV3D_SERIALIZE(Archive& archive)
 	{
-		archive(m_money, m_life, m_life_max, equip_charms, have_items, have_charms);
+		archive(m_money, m_life, m_life_max, equip_charms, have_items, have_charms,shop_solds);
 	}
 };

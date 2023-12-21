@@ -42,6 +42,7 @@ String Game_Manager::update() {
 			}
 			else if (U"event" == scene) {
 				update_event();
+				update_UI();
 			}
 			
 		}
@@ -95,6 +96,7 @@ void Game_Manager::draw()const {
 		else if (U"event"==scene) {
 			draw_game();
 			draw_event();
+
 		}
 		
 		
@@ -121,9 +123,12 @@ void Game_Manager::update_game() {
 
 	update_blocks(d_time);
 
+	//Player
 	player.update(d_time);
 	attack();
 	stick.update(d_time);
+	update_jump_effects(d_time);
+	update_dash_effects(d_time);
 
 	update_enemys(d_time);
 	update_items(d_time);
@@ -132,6 +137,7 @@ void Game_Manager::update_game() {
 
 	update_my_effects(d_time);
 	update_soul_bigs(d_time);
+	update_circle_effects(d_time);
 
 	//blockとの処理
 	vs();
@@ -146,6 +152,7 @@ void Game_Manager::update_game() {
 
 	delete_my_effects();
 	delete_soul_bigs();
+	delete_circle_effects();
 
 	//Event起動
 	start_event();
@@ -167,6 +174,9 @@ void Game_Manager::update_game() {
 
 	//UIの更新
 	update_UI();
+
+	//クイックマップ
+	update_show_quick_map();
 }
 
 void Game_Manager::draw_game()const {
@@ -191,31 +201,65 @@ void Game_Manager::draw_game()const {
 
 	renderTexture.draw();
 
+	
 
 	{
 		auto t = camera.createTransformer();
 
 		draw_bullet_enemys();
+		
+	}
+
+	//ダッシュエフェクト
+	draw_dash_effect_light();
+
+	{
+		auto t = camera.createTransformer();
+		draw_dash_effects();
+	}
+
+	//ジャンプエフェクト
+	draw_jump_effect_light();
+
+	{
+		auto t = camera.createTransformer();
+		draw_jump_effects();
+	}
+
+	draw_player_light();
+
+	{
+		auto t = camera.createTransformer();
 
 		draw_player();
+		
+		draw_circle_effects();
 
 		draw_enemys();
 
-		//stick.draw();
+		stick.draw();
+	
+		player.draw_stick();
 
 		draw_items();
 
 		draw_my_effects();
-
+		
 	}
+	
+
+	
 
 	draw_UI();
+
+	draw_show_quick_map();
 
 	//カメラデバッグ用
 	{
 		Circle circle(1920 / 2, 1080 / 2, 5);
 		circle.draw(Palette::Green);
 	}
+
 }
 
 
@@ -1350,7 +1394,18 @@ void Game_Manager::vs_stick_enemy() {
 				
 
 				if (enemy->get_muteki() == false) {
-					enemy->damage(1);
+
+					int power = 10;
+
+					float magnification = 1;
+
+					magnification += 0.2 * status.get_power();
+
+					power*= magnification;
+
+					
+
+					enemy->damage(power);
 					enemy->set_knock_back(stick.get_direction());
 				}
 			}

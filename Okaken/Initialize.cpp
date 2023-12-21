@@ -82,8 +82,11 @@ void Game_Manager::initialize_data() {
 	{
 		set_text_item(U"カギ",U"なにかのカギ");
 		set_pos_item(U"カギ", 3, 1);
+
+		set_text_item(U"おにぎり", U"");
 	}
 
+	//test
 	get_item(U"カギ");
 
 
@@ -107,8 +110,36 @@ void Game_Manager::initialize_data() {
 
 	//Shop
 	{
-		set_shop_goods(U"お祓い棒",100,0,0);
-		set_shop_goods(U"お祓い棒", 150, 0, 0);
+		set_shop_goods(U"カギ",100,0,0);
+		set_shop_goods(U"おにぎり", 150, 0, 1);
+		set_shop_goods(U"カギ", 150, 0, 2);
+		set_shop_goods(U"カギ", 150, 0, 3);
+		set_shop_goods(U"カギ", 150, 0, 4);
+		set_shop_goods(U"カギ", 150, 0, 5);
+
+		set_shop_goods_text(U"カギ", U"職員室の前で拾ったぜ。\n何のカギなんだろうな？？");
+		set_shop_goods_text(U"おにぎり", U"どっかの机の中に入っていたぜ。\nちょっと臭うぜ・・・");
+
+		//商品の追加
+		/*
+		if (event_super.get_var(U"") == 1) {
+
+		}*/
+
+		//売れているものを削除
+		shop_goods.remove_if([&](Shop_Goods goods) {
+
+
+			for (auto& solds : status.get_shop_solds()) {
+				if (solds == goods.name) {
+					return true;
+				}
+			}
+
+		return false;
+
+			});
+
 	}
 
 }
@@ -325,6 +356,71 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"player_wait", U"image/player/player/wait.png");
 	TextureAsset::Load(U"player_wait");
 
+	TextureAsset::Register(U"player_attack_0", U"image/player/player/attack_0.png");
+	TextureAsset::Load(U"player_attack_0");
+
+	TextureAsset::Register(U"player_attack_1", U"image/player/player/attack_1.png");
+	TextureAsset::Load(U"player_attack_1");
+
+	TextureAsset::Register(U"player_attack_2", U"image/player/player/attack_2.png");
+	TextureAsset::Load(U"player_attack_2");
+
+	TextureAsset::Register(U"player_attack_3", U"image/player/player/attack_3.png");
+	TextureAsset::Load(U"player_attack_3");
+
+	//player_under
+
+	TextureAsset::Register(U"player_under_wait", U"image/player/player/under_wait.png");
+	TextureAsset::Load(U"player_under_wait");
+
+	TextureAsset::Register(U"player_under_jump", U"image/player/player/under_jump.png");
+	TextureAsset::Load(U"player_under_jump");
+
+	TextureAsset::Register(U"player_under_walk_1", U"image/player/player/under_walk_1.png");
+	TextureAsset::Load(U"player_under_walk_1");
+
+	TextureAsset::Register(U"player_under_walk_2", U"image/player/player/under_walk_2.png");
+	TextureAsset::Load(U"player_under_walk_2");
+
+	TextureAsset::Register(U"player_under_walk_3", U"image/player/player/under_wait.png");
+	TextureAsset::Load(U"player_under_walk_3");
+
+	TextureAsset::Register(U"player_under_walk_4", U"image/player/player/under_walk_4.png");
+	TextureAsset::Load(U"player_under_walk_4");
+
+	TextureAsset::Register(U"player_under_walk_5", U"image/player/player/under_walk_5.png");
+	TextureAsset::Load(U"player_under_walk_5");
+
+
+	//jump_effect
+
+	TextureAsset::Register(U"player_jump_effect_0", U"image/player/jump/0.png");
+	TextureAsset::Load(U"player_jump_effect_0");
+
+	TextureAsset::Register(U"player_jump_effect_1", U"image/player/jump/1.png");
+	TextureAsset::Load(U"player_jump_effect_1");
+
+	TextureAsset::Register(U"player_jump_effect_2", U"image/player/jump/2.png");
+	TextureAsset::Load(U"player_jump_effect_2");
+
+	TextureAsset::Register(U"player_jump_effect_3", U"image/player/jump/3.png");
+	TextureAsset::Load(U"player_jump_effect_3");
+
+	TextureAsset::Register(U"player_jump_effect_4", U"image/player/jump/4.png");
+	TextureAsset::Load(U"player_jump_effect_4");
+
+
+	TextureAsset::Register(U"player_dash_effect_0", U"image/player/dash/0.png");
+	TextureAsset::Load(U"player_dash_effect_0");
+
+	TextureAsset::Register(U"player_dash_effect_1", U"image/player/dash/1.png");
+	TextureAsset::Load(U"player_dash_effect_1");
+
+	TextureAsset::Register(U"player_dash_effect_2", U"image/player/dash/2.png");
+	TextureAsset::Load(U"player_dash_effect_2");
+
+	TextureAsset::Register(U"player_dash_effect_3", U"image/player/dash/3.png");
+	TextureAsset::Load(U"player_dash_effect_3");
 
 
 
@@ -346,11 +442,41 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"event_save_point", U"image/event/save_point.png");
 	TextureAsset::Load(U"event_save_point");
 
-	TextureAsset::Register(U"stick_left", U"image/player/stick/left.png");
-	TextureAsset::Load(U"stick_left");
+	//Stick(お祓い棒)
 
+	TextureAsset::Register(U"stick_wait", U"image/player/stick/object_wait.png");
+	TextureAsset::Load(U"stick_wait");
+
+	TextureAsset::Register(U"stick_0", U"image/player/stick/object_0.png");
+	TextureAsset::Load(U"stick_0");
+
+	TextureAsset::Register(U"stick_1", U"image/player/stick/object_1.png");
+	TextureAsset::Load(U"stick_1");
+
+	TextureAsset::Register(U"stick_2", U"image/player/stick/object_2.png");
+	TextureAsset::Load(U"stick_2");
+
+	TextureAsset::Register(U"stick_3", U"image/player/stick/object_3.png");
+	TextureAsset::Load(U"stick_3");
+
+	//attack
+
+	TextureAsset::Register(U"attack_0", U"image/player/stick/attack_0.png");
+	TextureAsset::Load(U"attack_0");
+
+	TextureAsset::Register(U"attack_1", U"image/player/stick/attack_1.png");
+	TextureAsset::Load(U"attack_1");
+
+	TextureAsset::Register(U"attack_2", U"image/player/stick/attack_2.png");
+	TextureAsset::Load(U"attack_2");
+
+	TextureAsset::Register(U"attack_3", U"image/player/stick/attack_3.png");
+	TextureAsset::Load(U"attack_3");
+
+	/*
 	TextureAsset::Register(U"stick_right", U"image/player/stick/right.png");
 	TextureAsset::Load(U"stick_right");
+*/
 
 	TextureAsset::Register(U"item_heart", U"image/item/heart.png");
 	TextureAsset::Load(U"item_heart");
@@ -540,12 +666,17 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Load(U"maga_hollow");
 
 
-	TextureAsset::Register(U"shop_box", U"image/menu/shop_box.png");
+	TextureAsset::Register(U"shop_box", U"image/ui/shop_box.png");
 	TextureAsset::Load(U"shop_box");
 
+	TextureAsset::Register(U"shop_cur", U"image/ui/shop_cur.png");
+	TextureAsset::Load(U"shop_cur");
 
+	TextureAsset::Register(U"shop_top", U"image/ui/shop_top.png");
+	TextureAsset::Load(U"shop_top");
 
-
+	TextureAsset::Register(U"shop_under", U"image/ui/shop_under.png");
+	TextureAsset::Load(U"shop_under");
 
 	/*
 	TextureAsset::Register(U"item_カギ", U"image/item/カギ.png");
@@ -582,6 +713,9 @@ void Game_Manager::initialize_font() {
 
 	FontAsset::Register(U"BIZ_30", 30, U"font/BIZUDGothic-Regular.ttf");
 	FontAsset::Load(U"BIZ_30", preloadText);
+
+	FontAsset::Register(U"Mur_50", 50, U"font/Murecho-Bold.ttf");
+	FontAsset::Load(U"Mur_50", preloadText);
 }
 
 void Game_Manager::initialize_shader() {
@@ -599,6 +733,11 @@ void Game_Manager::initialize_shader() {
 		throw Error{ U"Failed to load a shader file" };
 	}
 
+	psViolet = HLSL{ U"shader/violet.hlsl", U"PS" };
+	if (not psViolet)
+	{
+		throw Error{ U"Failed to load a shader file" };
+	}
 }
 
 void Game_Manager::initialize_UI() {
@@ -651,5 +790,7 @@ void Game_Manager::initialize_debug() {
 	}
 
 	status.test();
+
+	status.plus_money(500);
 
 }

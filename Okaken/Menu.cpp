@@ -160,7 +160,7 @@ void Game_Manager::draw_menu_main()const {
 
 	int cur_x = menu_cur_main.get_x();
 
-	const float fade = 0.3;
+	const float fade = 0.2;
 
 	if (0 == cur_x) {
 		TextureAsset(U"menu_black").draw(edge + (image_wide + blank) * (1), 280, ColorF(1,fade));

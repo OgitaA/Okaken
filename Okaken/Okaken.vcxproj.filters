@@ -280,6 +280,12 @@
     <Filter Include="Source Files\Scene\Game\Game_Manager\My_Effect_Manager">
       <UniqueIdentifier>{85480797-1574-41ed-9dec-ddfa91ee9101}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene\Game\Game_Manager\Player\Effect">
+      <UniqueIdentifier>{5b13b002-af04-4c95-b0be-0776453ff7aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Game\Game_Manager\Circle_Effect_Manager">
+      <UniqueIdentifier>{e61a9ee0-886d-49e4-b7ab-cb23386ce253}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -1126,6 +1132,18 @@
     </ClInclude>
     <ClInclude Include="Red_Effect.hpp">
       <Filter>Source Files\Scene\Game\Game_Manager\Shader_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Jump_Effect.hpp">
+      <Filter>Source Files\Scene\Game\Game_Manager\Player\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Dash_Effect.hpp">
+      <Filter>Source Files\Scene\Game\Game_Manager\Player\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Light_Bloom.hpp">
+      <Filter>Source Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Circle_Effect.hpp">
+      <Filter>Source Files\Scene\Game\Game_Manager\Circle_Effect_Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

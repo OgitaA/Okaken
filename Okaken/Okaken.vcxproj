@@ -340,8 +340,10 @@
     <ClInclude Include="Bound_Block.hpp" />
     <ClInclude Include="Break_Block.hpp" />
     <ClInclude Include="Bullet_Enemy.hpp" />
+    <ClInclude Include="Circle_Effect.hpp" />
     <ClInclude Include="Cleaner.hpp" />
     <ClInclude Include="Cur.hpp" />
+    <ClInclude Include="Dash_Effect.hpp" />
     <ClInclude Include="Deco.hpp" />
     <ClInclude Include="Detail_Setter.hpp" />
     <ClInclude Include="Equip_Charm.hpp" />
@@ -360,7 +362,9 @@
     <ClInclude Include="Hitotume.hpp" />
     <ClInclude Include="Indent_Drawer.hpp" />
     <ClInclude Include="Item.hpp" />
+    <ClInclude Include="Jump_Effect.hpp" />
     <ClInclude Include="Kasa.hpp" />
+    <ClInclude Include="Light_Bloom.hpp" />
     <ClInclude Include="Memo.hpp" />
     <ClInclude Include="Message_Box.hpp" />
     <ClInclude Include="Move_Floor.hpp" />
