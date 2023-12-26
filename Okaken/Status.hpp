@@ -583,8 +583,16 @@ public:
 		shop_solds.push_back(data);
 	}
 
-	
+	//ability
 
+	void plus_have_ablity(String set_name) {
+
+		have_ability.push_back(set_name);
+	}
+
+	Array<String> get_have_ability()const {
+		return have_ability;
+	}
 
 
 private:
@@ -606,6 +614,9 @@ private:
 	Array<Have_Item> have_items;
 
 	Array<String> shop_solds;
+
+	//能力
+	Array<String> have_ability;
 
 	template <class Archive>
 	void SIV3D_SERIALIZE(Archive& archive)

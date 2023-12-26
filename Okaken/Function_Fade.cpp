@@ -41,12 +41,22 @@ void Game_Manager::update_fade() {
 				game_over_count = 0;
 				game_over_scene = 0;
 
-				reset_area();
+				
 
 				player.reset();
 
 				player.set_game_over_flag(false);
 
+				//リスポーン地点に移動
+				respawn();
+				//ステージデータを読み込み、ステージを再構成
+				reset_area();
+				//ゲームの進行状況を読み込み
+				retry();
+
+				control_scroll();
+				//スクロール処理2
+				camera.jumpTo(scroll, 1.0);
 			}
 			else if (fade_scene_type == U"scene") {
 
@@ -83,7 +93,9 @@ void Game_Manager::update_fade() {
 
 				player.set_ground_pos(fade_scene_go_area_pos.x, fade_scene_go_area_pos.y);
 
-
+				if (fade_scene_direction != U"none") {
+					player.set_direction(fade_scene_direction);
+				}
 
 				load_area_data();
 				make_stage();
@@ -139,4 +151,16 @@ void Game_Manager::initialize_fade() {
 	//Option
 	fade_go_scene_plus_layer = -1;
 	fade_go_scene_plus_scene = U"";
+}
+
+//ロード時も読み込みたい
+void Game_Manager::retry() {
+
+	for (auto& ability : status.get_have_ability()) {
+
+		//お祓い棒をもっている
+		if (U"stick" == ability) {
+			player.set_have_stick();
+		}
+	}
 }

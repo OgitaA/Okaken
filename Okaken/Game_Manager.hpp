@@ -95,6 +95,9 @@ public:
 
 	void initialize_debug();
 
+	void load_div_gragh(const String& name,const FilePath& path, const Size& size);
+
+	void register_tiles(const String& name,const FilePathView path, const Size& regionSize, int32 xCount, int32 yCount);
 
 	String update();
 	void draw()const;
@@ -160,6 +163,7 @@ private:
 		bullet_enemys.clear();
 		my_effects.clear();
 
+		load_area_data();
 		make_stage();
 	}
 
@@ -250,9 +254,11 @@ private:
 			player.draw();
 		}
 
+		//player.get_rect().drawFrame(5, Palette::Orange);
 		
 	}
 
+	LightBloom player_light_bloom;
 
 	//別のスクロールで描画(別のレンダーテクスチャを使うので)
 	void draw_player_light()const {
@@ -264,12 +270,12 @@ private:
 				{
 					auto t = camera.createTransformer();
 
-					ScopedLightBloom target{ light_bloom };
+					ScopedLightBloom target{ player_light_bloom };
 
 					draw_player_violet();
 				}
 
-				light_bloom.draw(player.get_violet());
+				player_light_bloom.draw(player.get_violet());
 
 			}
 		}
@@ -289,56 +295,63 @@ private:
 		}
 	}
 
+	LightBloom dash_effect_light_bloom;
+
 	void draw_dash_effect_light()const {
 
-
-		for (auto& effect : dash_effects) {
+		{
+			ScopedLightBloom target{ dash_effect_light_bloom };
 
 			{
 				auto t = camera.createTransformer();
 
-				ScopedLightBloom target{ light_bloom };
+				for (auto& effect : dash_effects) {
 
-				{
-					const ScopedCustomShader2D shader{ psViolet };
+					{
+						const ScopedCustomShader2D shader{ psViolet };
 
-					cbViolet->strength = 1;
+						cbViolet->strength = 1;
 
-					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
+						Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
 
-					effect.draw();
+						effect.draw();
+					}
+
 				}
-
 			}
-
-			light_bloom.draw(player.get_violet());
 		}
 
+		dash_effect_light_bloom.draw(player.get_violet());
 	}
+
+	LightBloom jump_effect_light_bloom;
 
 	void draw_jump_effect_light()const {
 
-		for (auto& effect : jump_effects) {
+		{
+			ScopedLightBloom target{ jump_effect_light_bloom };
 
 			{
 				auto t = camera.createTransformer();
 
-				ScopedLightBloom target{ light_bloom };
+				for (auto& effect : jump_effects) {
+					{
+						const ScopedCustomShader2D shader{ psViolet };
 
-				{
-					const ScopedCustomShader2D shader{ psViolet };
+						cbViolet->strength = 1;
 
-					cbViolet->strength = 1;
+						Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
 
-					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbViolet);
+						effect.draw();
+					}
 
-					effect.draw();
 				}
-
 			}
 
-			light_bloom.draw(player.get_violet());
+
 		}
+
+		jump_effect_light_bloom.draw(player.get_violet());
 	}
 
 	//使用しない
@@ -358,7 +371,7 @@ private:
 		}
 	}
 
-	LightBloom light_bloom;
+
 	
 	
 
@@ -510,6 +523,8 @@ private:
 
 	}
 
+	
+
 
 	//Block
 	Array<std::shared_ptr<Block>> blocks;
@@ -556,15 +571,23 @@ private:
 	}
 	void draw_enemys()const {
 
-		const ScopedCustomShader2D shader{ psWhite };
+		{
+			const ScopedCustomShader2D shader{ psWhite };
 
-		for (auto& enemy : enemys) {
+			for (auto& enemy : enemys) {
 
-			cbWhite->strength = enemy->get_white() * 2;
+				cbWhite->strength = enemy->get_white() * 2;
 
-			Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbWhite);
-			enemy->draw();
+				Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbWhite);
+				enemy->draw();
+
+			}
 		}
+
+		/*
+		for (auto& enemy : enemys) {
+			enemy->get_hit_rect().drawFrame(10, Palette::Red);
+		}*/
 	}
 	void delete_enemy() {
 
@@ -642,6 +665,114 @@ private:
 			}
 		}
 	}
+
+	//特殊オブジェクト
+	class Special_Object {
+
+	public:
+
+		Special_Object(){}
+
+		Special_Object(String set_name,float set_x, float set_y,String set_color) {
+
+			name = set_name;
+			pos = { set_x,set_y };
+			color = set_color;
+		}
+
+		Special_Object(String set_name, float set_x, float set_y) {
+
+			name = set_name;
+			pos = { set_x,set_y };
+		}
+
+		void draw()const {
+
+			String image_name = U"special_object_" + name;
+
+			TextureAsset(image_name).draw(pos.x * 72, pos.y * 72);
+		}
+
+		String get_color()const { return color; }
+		String get_name()const { return name; }
+		Vec2 get_pos()const { return pos; }
+
+	private:
+
+		String name;
+		Vec2 pos;
+		String color = U"no";
+	};
+	Array<Special_Object> special_objects;
+
+	LightBloom object_bloom;
+
+	void draw_special_objects_light()const {
+
+		{
+			auto t = camera.createTransformer();
+
+			ScopedLightBloom target{ object_bloom };
+
+			//色をつけて描画
+			for (auto& object : special_objects) {
+
+				if (U"red" == object.get_color()) {
+
+					const ScopedCustomShader2D shader{ psRed };
+
+					cbRed->strength = 1;
+
+					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbRed);
+
+					object.draw();
+				}
+				else if (U"green" == object.get_color()) {
+
+					const ScopedCustomShader2D shader{ psGreen };
+
+					cbGreen->strength = 1;
+
+					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbGreen);
+
+					object.draw();
+				}
+				else if (U"brown" == object.get_color()) {
+
+					const ScopedCustomShader2D shader{ psBrown };
+
+					cbBrown->strength = 1;
+
+					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbBrown);
+
+					object.draw();
+				}
+				else if (U"white" == object.get_color()) {
+
+					const ScopedCustomShader2D shader{ psWhite };
+
+					cbWhite->strength = 1;
+
+					Graphics2D::SetConstantBuffer(ShaderStage::Pixel, 1, cbWhite);
+
+					object.draw();
+				}
+			}
+		}
+
+		//発光描画
+		object_bloom.draw(1);
+	}
+
+	void draw_special_object()const {
+
+		for (auto& object : special_objects) {
+
+			object.draw();
+		}
+	}
+
+
 
 
 	//Item
@@ -825,181 +956,29 @@ private:
 
 	//Make_Stage
 	struct Block_Name {
+
+		Block_Name(String set_name, int set_x, int set_y) {
+			name = set_name;
+			x = set_x;
+			y = set_y;
+		}
+
 		int x = 0;
 		int y = 0;
 		String name = U"";
 	};
 	Array<Block_Name> block_names;
-	
-	void make_stage() {
 
-		//Block
+	void set_block_name(String name,int x,int y){
 
-		blocks.clear();
-
-		for (auto& block_data : block_datas) {
-
-			int x = block_data.x;
-			int y = block_data.y;
-			int image_x = block_data.image_x;
-			int image_y = block_data.image_y;
-		
-			String name = U"";
-
-			for (auto& b_n : block_names) {
-
-				if (b_n.x == image_x and b_n.y==image_y) {
-					name = b_n.name;
-					break;
-				}
-			}
-			
-
-			if (U"needle" == name) {
-				blocks.push_back(std::make_unique<Needle>(name, x, y));
-			}
-			else if (U"slip" == name) {
-				blocks.push_back(std::make_unique<Slip_Block>(name, x, y));
-			}
-			else if (U"bound" == name) {
-				blocks.push_back(std::make_unique<Bound_Block>(name, x, y));
-			}
-			else if (U"break" == name) {
-				blocks.push_back(std::make_unique<Break_Block>(name, x, y));
-			}
-			else {
-
-				blocks.push_back(std::make_unique<Block>(name,x, y, image_x, image_y));
-
-			}
-
-			//blocks.push_back(std::make_unique<One_Way_Floor>(center_x + 300, y - 200));
-			//blocks.push_back(std::make_unique<Move_Floor>(center_x - 500, y));
-			//blocks.push_back(std::make_unique<Move_Floor>(center_x - 500, y - 600));
-
-			//block_manager.plus_block(x, y, name);
-		}
-
-		//Enemy
-
-		enemys.clear();
-
-		
-		
-			
-
-		for (auto& enemy_data : enemy_datas) {
-
-			int x = enemy_data.x;
-			int y = enemy_data.y;
-			String name = enemy_data.name;
-
-			make_enemy(name, x, y);
-
-		}
-		
-
-		//Tile
-
-		tiles.clear();
-
-		for (auto& tile_data : tile_datas) {
-
-			int x = tile_data.x;
-			int y = tile_data.y;
-			int image_x = tile_data.image_x;
-			int image_y = tile_data.image_y;
-
-			tiles.push_back(Tile(x, y,image_x,image_y));
-		}
-
-
-		//Deco
-
-		decos.clear();
-
-		for (auto& deco_data : deco_datas) {
-
-			int x = deco_data.x;
-			int y = deco_data.y;
-			int image_x = deco_data.image_x;
-			int image_y = deco_data.image_y;
-
-			
-			decos.push_back(Deco(x, y, image_x, image_y));
-		}
-
-		//Event
-
-		events.clear();
-
-		for (auto& event_data : event_datas) {
-
-			int x = event_data.x;
-			int y = event_data.y;
-			int id = event_data.ID;
-			int image_x = event_data.image_x;
-			int image_y = event_data.image_y;
-
-			events.push_back(Event(x,y,id,image_x,image_y));
-		}
-
-		int x_max = 0;
-		int y_max = 0;
-
-		for (auto& block : blocks) {
-
-			int v_x = block->get_rect().x + 72;
-			if (x_max < v_x) {
-				x_max = v_x;
-			}
-
-			int v_y = block->get_rect().y + 72;
-			if (y_max < v_y) {
-				y_max = v_y;
-			}
-
-		}
-
-		for (auto& tile : tiles) {
-
-			int v_x = tile.get_rect().x + 72;
-			if (x_max < v_x) {
-				x_max = v_x;
-			}
-
-			int v_y = tile.get_rect().y + 72;
-			if (y_max < v_y) {
-				y_max = v_y;
-			}
-
-		}
-
-		area_wide = x_max;
-		area_height = y_max;
-
-		bool no_data = true;
-
-		
-
-		for (auto& data : area_datas) {
-
-			if (area == data.name) {
-				area_wide = data.wide;
-				area_height = data.height;
-
-				no_data = false;
-
-				
-				break;
-			}
-		}
-
-		if (true == no_data) {
-			throw Error{ U"you_are_lost_in_null_area!!" };
-		}
-		
+		block_names.push_back(Block_Name(name, x, y));
 	}
+
+	void make_stage();
+
+	
+
+	void make_stage_plus();
 
 	//Action
 	Stick stick;
@@ -1008,30 +987,38 @@ private:
 
 	void attack() {
 
-		if (KeyX.down() and false == player.get_action_lock() and false==game_over_flag and player.get_attack()) {
 
-			String direction = player.get_direction();
-			float x = 0;
-			float y = 0;
+		if (KeyX.down() == true) {
 
-			/*
-			if (direction == U"left") {
-				x = player.get_rect().x;
+			if (player.get_have_stick() == true) {
+
+				if (false == player.get_action_lock() and false == game_over_flag and player.get_attack()) {
+
+					String direction = player.get_direction();
+					float x = 0;
+					float y = 0;
+
+					/*
+					if (direction == U"left") {
+						x = player.get_rect().x;
+					}
+					else if (direction == U"right") {
+						x = player.get_rect().x + player.get_rect().w;
+					}*/
+
+					x = player.get_rect().x + player.get_rect().w / 2;
+
+					y = player.get_rect().y;
+
+					stick.make_attack(direction, x, y);
+
+
+					player.set_attack_cool_time();
+				}
 			}
-			else if (direction == U"right") {
-				x = player.get_rect().x + player.get_rect().w;
-			}*/
-
-			x = player.get_rect().x + player.get_rect().w / 2;
-
-			y = player.get_rect().y;
-
-			stick.make_attack(direction, x, y);
-
-
-			player.set_attack_cool_time();
 		}
 
+		//お祓い棒関係の描画補正
 		if (stick.get_exist()) {
 
 			float x = 0;
@@ -1600,10 +1587,11 @@ private:
 		}
 
 
+		int life_left_x = 72;
+		int life_left_y = 6;
 
-
-		TextureAsset(U"life_bar_bottom").draw(50, 20);
-		TextureAsset(U"life_bar_white")(0, 0, hp_white_v, 60).draw(50, 20);
+		TextureAsset(U"life_bar_bottom").draw(life_left_x, life_left_y);
+		TextureAsset(U"life_bar_white")(0, 0, hp_white_v, 60).draw(life_left_x, life_left_y);
 
 
 		float v = 450 * status.get_life() / status.get_life_max();
@@ -1612,8 +1600,8 @@ private:
 			v = 450;
 		}
 
-		TextureAsset(U"life_bar_red")(0, 0, v, 60).draw(50, 20);
-		TextureAsset(U"life_bar_frame").draw(50, 20);
+		TextureAsset(U"life_bar_red")(0, 0, v, 60).draw(life_left_x, life_left_y);
+		TextureAsset(U"life_bar_frame").draw(life_left_x, life_left_y);
 
 		/*
 		{
@@ -1631,12 +1619,15 @@ private:
 
 		//TextureAsset(U"purse").draw(50,100);
 
+		int soul_left_x = 72;
+		int soul_left_y = 80;
+
 		for (int i = 0; i < status.get_power_max(); i++) {
-			TextureAsset(U"power_soul_empty").draw(50 + (i * 70), 90);
+			TextureAsset(U"power_soul_empty").draw(soul_left_x + (i * 70), soul_left_y);
 		}
 
 		for (int i = 0; i < status.get_power(); i++) {
-			TextureAsset(U"power_soul").draw(50 + (i * 70), 90);
+			TextureAsset(U"power_soul").draw(soul_left_x + (i * 70), soul_left_y);
 		}
 
 
@@ -1656,13 +1647,16 @@ private:
 			fade = 1;
 		}
 
-			TextureAsset(U"purse").draw(70, 175, ColorF(1, fade));
+		//財布
+		int purse_left_x = 72;
+
+			TextureAsset(U"purse").draw(purse_left_x, 175, ColorF(1, fade));
 
 			const double outlineScale = 0.5;
 			const ColorF outlineColor = ColorF(0, 0, 0, fade);
 
 			//fontSDF_40(status.get_money()).draw(TextStyle::Outline(outlineScale, outlineColor), 70+100, 160+2,ColorF(1,fade));
-			fontSDF_40(status.get_money()).draw(TextStyle::Outline(outlineScale, outlineColor), 70 + 100, 160 + 2, ColorF(1, 1, 1, fade));
+			fontSDF_40(status.get_money()).draw(TextStyle::Outline(outlineScale, outlineColor), purse_left_x + 100, 160 + 2, ColorF(1, 1, 1, fade));
 		
 
 
@@ -1879,10 +1873,22 @@ private:
 
 	void go_area(String go_name,int x,int y) {
 
+		go_area_common(go_name, x, y);
+		fade_scene_direction = U"none";
+	}
+
+	void go_area(String go_name, int x, int y,String direction) {
+
+		go_area_common(go_name, x, y);
+		fade_scene_direction = direction;
+	}
+
+	void go_area_common(String go_name, int x, int y) {
+
 		initialize_fade();
 		fade_scene_type = U"area";
 		fade_scene_go_area = go_name;
-		fade_scene_go_area_pos = { x*72,y*72 };
+		fade_scene_go_area_pos = { x * 72,y * 72 };
 	}
 
 	void set_bg(String set_bg) {
@@ -1913,11 +1919,18 @@ private:
 	void ev_enter_first_toilet();
 	void ev_exit_first_toilet();
 
+	void ev_goback_world_A_1();
+	void ev_go_world_A_2();
+
 	
 
 	void ev_talk_test();
 
 
+	void ev_get_stick();
+
+
+	//Story
 	void ev_story_1();
 
 
@@ -2063,6 +2076,8 @@ private:
 	String fade_scene_go_area = U"";
 	Vec2 fade_scene_go_area_pos = { 0,0 };
 
+	String fade_scene_direction = U"";
+
 	
 	int fade_go_scene_plus_layer = 0;
 	String fade_go_scene_plus_scene = U"";
@@ -2079,13 +2094,28 @@ private:
 	PixelShader psViolet;
 	mutable ConstantBuffer<WhiteEffectConstants> cbViolet;
 
+	PixelShader psGreen;
+	mutable ConstantBuffer<WhiteEffectConstants> cbGreen;
+
+	PixelShader psBrown;
+	mutable ConstantBuffer<WhiteEffectConstants> cbBrown;
+
 	//GameOver
 	bool game_over_flag = false;
 	float game_over_count = 0;
 	int game_over_scene = 0;
 
+	float game_over_count_v = 3;
+
 	void check_game_over() {
-		if (status.get_life() <= 0) {
+		if (status.get_life() <= 0 or out_screen_gameover()) {
+
+			if (status.get_life() <= 0) {
+				game_over_count_v = 3;
+			}
+			else if (out_screen_gameover()) {
+				game_over_count_v = 2;
+			}
 
 			game_over_flag = true;
 
@@ -2101,7 +2131,9 @@ private:
 
 			if (0 == game_over_scene) {
 
-				if (game_over_count > 3) {
+				bool go_fade = false;
+
+				if (game_over_count >= game_over_count_v) {
 
 					initialize_fade();
 
@@ -2119,7 +2151,24 @@ private:
 		}
 	}
 
-	
+	bool out_screen_gameover() {
+
+		if (player.get_rect().topY()>=area_height) {
+			return true;
+		}
+		else if (player.get_rect().bottomY() < 0) {
+			return true;
+		}
+
+		if (player.get_rect().leftX() < 0) {
+			return true;
+		}
+		else if (player.get_rect().leftX() >= area_wide) {
+			return true;
+		}
+
+		return false;
+	}
 
 
 
@@ -2242,6 +2291,64 @@ private:
 			}
 		}
 	}
+
+	//Spirit
+	void draw_spirit_back()const {
+		TextureAsset(U"spirit_back").draw(0, 0);
+	}
+
+	//Base
+	String back_base_name = U"normal";
+	void draw_back_base()const {
+
+		String image_name = U"back_base_" + back_base_name;
+
+		TextureAsset(image_name).draw(0, 0);
+	}
+
+
+	//Title
+
+	void update_title();
+	void draw_title()const;
+
+	//Respawn
+	struct Respawn_Point {
+
+		String area = U"";
+		int x = 1920 / 2;
+		int y = 1080 / 2;
+	};
+
+	Respawn_Point respawn_point;
+
+	void update_respawn() {
+
+		for (auto& object : special_objects) {
+
+			if (object.get_name() == U"torii") {
+				Rect rect(object.get_pos().x * 72, object.get_pos().y * 72, 6 * 72, 6 * 72);
+
+				if (rect.intersects(player.get_rect())) {
+					respawn_point.area = area;
+					respawn_point.x = object.get_pos().x;
+					respawn_point.y = object.get_pos().y;
+					break;
+				}
+			}
+		}
+	}
+
+	void respawn() {
+
+		area = respawn_point.area;
+		int x = (respawn_point.x + 3) * 72 - player.get_rect().w / 2;
+		int y = (respawn_point.y + 4) * 72;
+	
+		player.set_ground_pos(x, y);
+	}
+
+	void retry();
 
 
 };

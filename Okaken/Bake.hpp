@@ -12,13 +12,18 @@ public:
 		m_name = U"bake";
 		m_is_air = true;
 
-		adjust_w = 72;
-		adjust_h = 72;
+		m_wide = 110;
+		m_height = 120;
 
-		m_hp = 30;
+		adjust_x = 8;
+		adjust_y = 31;
+		adjust_w = 78;
+		adjust_h = 68;
 
-		m_drop_heart = 1;
-		m_drop_soul = 1;
+		m_hp = 21;
+
+		//m_drop_heart = 1;
+		//m_drop_soul = 1;
 
 		m_drop_coin_10 = 3;
 
@@ -82,7 +87,13 @@ public:
 
 		String image_name = U"enemy_" + m_name;
 
-		TextureAsset(image_name).draw(m_pos);
+		bool mirror = false;
+
+		if (U"right" == direction) {
+			mirror = true;
+		}
+
+		TextureAsset(image_name).mirrored(mirror).draw(m_pos);
 	}
 
 private:

@@ -1,20 +1,12 @@
-﻿#include"Title.hpp"
+﻿#include"Game_Manager.hpp"
 
-Title::Title(const InitData& init)
-	:IScene(init)
-{
-	TextureAsset::Register(U"title_back", U"image/title/back.png");
-	TextureAsset::Load(U"title_back");
+void Game_Manager::update_title() {
+
+
 }
 
-void Title::update()
-{
-	if (KeyZ.down()) {
-		changeScene(State::Game);
-	}
-}
+void Game_Manager::draw_title()const {
 
-void Title::draw()const
-{
 	TextureAsset(U"title_back").draw(0, 0);
 }
+

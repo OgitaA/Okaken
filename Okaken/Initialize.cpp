@@ -36,9 +36,16 @@ void Game_Manager::initialize_data() {
 
 		set_zone_data(U"under");
 
+		set_zone_data(U"world_A");
+
+
+
+
 		set_area_data(U"test_room", 72 * 30, 72 * 30,U"test_room");
 
+		//通常マップ
 
+		set_area_data(U"under_1", 72 * 50, 1080, U"under");
 		set_area_data(U"first_1", 72 * 73 + 72 * 24, 1080, U"first");
 		set_area_data(U"second_1", 72 * 73 + 72 * 24, 1080, U"second");
 		set_area_data(U"third_1", 72 * 73 + 72 * 24, 1080, U"third");
@@ -46,11 +53,14 @@ void Game_Manager::initialize_data() {
 		set_area_data(U"fifth_1", 72 * 73 + 72 * 24, 1080, U"fifth");
 		set_area_data(U"sixth_1", 72 * 73 + 72 * 24, 1080, U"sixth");
 
-
 		set_area_data(U"first_toilet", 72 * 50, 1080, U"first");
 
 
-		set_area_data(U"under_1", 72 * 50, 1080, U"under");
+		//霊界マップ
+		set_area_data(U"world_A_1", 72 * 80, 1080, U"world_A");
+		set_area_data(U"world_A_2", 72 * 80, 1080, U"world_A");
+		set_area_data(U"world_A_3", 72 * 80, 1080, U"world_A");
+	
 	}
 
 
@@ -74,7 +84,7 @@ void Game_Manager::initialize_data() {
 	//使わないデータ
 	//Weapon_Data
 	{
-		set_text_weapon(U"お祓い棒", U"邪気を払うお祓い棒");
+		set_text_weapon(U"お祓い棒", U"邪気を払うお祓い棒。\n「九条家」と書かれている。");
 		
 	}
 
@@ -141,6 +151,10 @@ void Game_Manager::initialize_data() {
 			});
 
 	}
+
+	//block変換(場所変える時は派生クラスも確認!!)
+	set_block_name(U"needle", 5, 0);
+	set_block_name(U"break", 6, 0);
 
 }
 
@@ -261,6 +275,12 @@ void Game_Manager::initialize_image() {
 
 	//Image
 
+	register_tiles(U"block", U"image/block/tile.png", Size{ 72,72 }, 20, 20);
+	register_tiles(U"tile", U"image/tile/tile.png", Size{ 72,72 }, 20, 20);
+	register_tiles(U"deco", U"image/deco/tile.png", Size{ 72,72 }, 20, 20);
+	register_tiles(U"event", U"image/event/tile.png", Size{ 72,72 }, 20, 20);
+
+	/*
 	//自動読み込み
 	for (auto& box : select_boxs) {
 
@@ -305,24 +325,29 @@ void Game_Manager::initialize_image() {
 				TextureAsset::Register(deco_name, adress);
 				TextureAsset::Load(deco_name);
 			}
-		}*/
+		}
+	}*/
+
+	//リリース時抜く
+	{
+		//Tile
+		TextureAsset::Register(U"block_tile", U"image/block/tile.png");
+		TextureAsset::Load(U"block_tile");
+
+		//Tile
+		TextureAsset::Register(U"tile_tile", U"image/tile/tile.png");
+		TextureAsset::Load(U"tile_tile");
+
+		//Deco
+		TextureAsset::Register(U"deco_tile", U"image/deco/tile.png");
+		TextureAsset::Load(U"deco_tile");
+
+		//Event
+		TextureAsset::Register(U"event_tile", U"image/event/tile.png");
+		TextureAsset::Load(U"event_tile");
 	}
 
-	//Tile
-	TextureAsset::Register(U"block_tile", U"image/block/tile.png");
-	TextureAsset::Load(U"block_tile");
-
-	//Tile
-	TextureAsset::Register(U"tile_tile", U"image/tile/tile.png");
-	TextureAsset::Load(U"tile_tile");
-
-	//Deco
-	TextureAsset::Register(U"deco_tile", U"image/deco/tile.png");
-	TextureAsset::Load(U"deco_tile");
-
-	//Deco
-	TextureAsset::Register(U"event_tile", U"image/event/tile.png");
-	TextureAsset::Load(U"event_tile");
+	
 
 	/*
 
@@ -345,6 +370,32 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"block_bound", U"image/block/bound.png");
 	TextureAsset::Load(U"block_bound");
 */
+
+	
+
+	TextureAsset::Register(U"effect_break_block_0", U"image/effect/break_block/0.png");
+	TextureAsset::Load(U"effect_break_block_0");
+
+	TextureAsset::Register(U"effect_break_block_1", U"image/effect/break_block/1.png");
+	TextureAsset::Load(U"effect_break_block_1");
+
+	TextureAsset::Register(U"effect_break_block_2", U"image/effect/break_block/2.png");
+	TextureAsset::Load(U"effect_break_block_2");
+
+	TextureAsset::Register(U"effect_break_block_3", U"image/effect/break_block/3.png");
+	TextureAsset::Load(U"effect_break_block_3");
+
+	TextureAsset::Register(U"effect_break_block_4", U"image/effect/break_block/4.png");
+	TextureAsset::Load(U"effect_break_block_4");
+
+	TextureAsset::Register(U"effect_break_block_5", U"image/effect/break_block/5.png");
+	TextureAsset::Load(U"effect_break_block_5");
+
+	TextureAsset::Register(U"effect_break_block_6", U"image/effect/break_block/6.png");
+	TextureAsset::Load(U"effect_break_block_6");
+
+	TextureAsset::Register(U"effect_break_block_7", U"image/effect/break_block/7.png");
+	TextureAsset::Load(U"effect_break_block_7");
 
    /*
    TextureAsset::Register(U"tile_gray_wall", U"image/tile/gray_wall.png");
@@ -689,6 +740,53 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Load(U"maga_緑の勾玉");
 
 */
+
+	TextureAsset::Register(U"spirit_back", U"image/other/spirit.png");
+	TextureAsset::Load(U"spirit_back");
+
+	//仮置き
+
+	TextureAsset::Register(U"spirit_back", U"image/other/spirit.png");
+	TextureAsset::Load(U"spirit_back");
+
+	TextureAsset::Register(U"special_object_torii", U"image/other/torii.png");
+	TextureAsset::Load(U"special_object_torii");
+
+	TextureAsset::Register(U"special_object_mirror", U"image/other/mirror.png");
+	TextureAsset::Load(U"special_object_mirror");
+
+	TextureAsset::Register(U"special_object_board_0", U"image/other/board_0.png");
+	TextureAsset::Load(U"special_object_board_0");
+
+	TextureAsset::Register(U"special_object_board_1", U"image/other/board_1.png");
+	TextureAsset::Load(U"special_object_board_1");
+
+	TextureAsset::Register(U"special_object_board_2", U"image/other/board_2.png");
+	TextureAsset::Load(U"special_object_board_2");
+
+	TextureAsset::Register(U"special_object_board_3", U"image/other/board_3.png");
+	TextureAsset::Load(U"special_object_board_3");
+
+	TextureAsset::Register(U"special_object_board_4", U"image/other/board_4.png");
+	TextureAsset::Load(U"special_object_board_4");
+
+	TextureAsset::Register(U"special_object_board_5", U"image/other/board_5.png");
+	TextureAsset::Load(U"special_object_board_5");
+
+	TextureAsset::Register(U"special_object_board_6", U"image/other/board_6.png");
+	TextureAsset::Load(U"special_object_board_6");
+
+	TextureAsset::Register(U"special_object_door", U"image/other/door.png");
+	TextureAsset::Load(U"special_object_door");
+
+	TextureAsset::Register(U"special_object_soul", U"image/other/soul.png");
+	TextureAsset::Load(U"special_object_soul");
+
+	TextureAsset::Register(U"back_base_normal", U"image/back_base/normal.png");
+	TextureAsset::Load(U"back_base_normal");
+
+	TextureAsset::Register(U"blue", U"image/back_base/normal.png");
+	TextureAsset::Load(U"blue");
 }
 
 
@@ -738,6 +836,20 @@ void Game_Manager::initialize_shader() {
 	{
 		throw Error{ U"Failed to load a shader file" };
 	}
+
+	psGreen = HLSL{ U"shader/green.hlsl", U"PS" };
+	if (not psGreen)
+	{
+		throw Error{ U"Failed to load a shader file" };
+	}
+
+	psBrown = HLSL{ U"shader/brown.hlsl", U"PS" };
+	if (not psBrown)
+	{
+		throw Error{ U"Failed to load a shader file" };
+	}
+
+
 }
 
 void Game_Manager::initialize_UI() {
@@ -758,6 +870,8 @@ void Game_Manager::initialize_UI() {
 void Game_Manager::initialize_event() {
 
 	event_super.plus_var(U"display_5", 0);
+
+	event_super.plus_var(U"got_stick", 0);
 }
 
 void Game_Manager::initialize_music() {

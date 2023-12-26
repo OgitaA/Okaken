@@ -17,11 +17,19 @@ public:
 		m_type = Block_Type::E_Break;
 
 		m_normal_colission = true;
+
+		image_x = 6;
+		image_y = 0;
 	}
 
 	void draw()const override {
 
-		get_rect().draw(Palette::Darkgray);
+		//TextureAsset(U"block_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+
+		const int32 index = (image_x + image_y * 20);
+		TextureAsset(U"block_{}"_fmt(index)).draw(x * 72, y * 72);
+
+		//get_rect().draw(Palette::Darkgray);
 	}
 
 

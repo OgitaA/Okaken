@@ -12,8 +12,11 @@ void Player::reset() {
 	m_pos = { 1920 / 2,900 - 200 };
 	m_pos_old = m_pos;
 
-	m_wide = 74;
+	//m_wide = 74;
+	m_wide = 40;
 	m_height = 150;
+
+	
 
 	m_direction = U"right";
 
@@ -91,7 +94,7 @@ void Player::reset() {
 
 	direction_lock = false;
 
-	display_stick = true;
+	
 
 	//アタック
 	attack_count = 0;
@@ -107,10 +110,13 @@ void Player::reset() {
 
 	//紫
 	violet = 0;
+	dark_light = true;
 
 	//歩行アニメ
 	walk_page = 0;
 	walk_count = 0;
+
+	have_stick = false;
 }
 
 
@@ -121,7 +127,7 @@ void Player::update(float d_time) {
 	//１フレーム前の座標を取得
 	m_pos_old = m_pos;
 
-	//操作をロックする
+	//ゲームオーバー中またはノックバック中は操作をロックする
 	action_lock = false;
 	if (game_over_flag == true or knock_back == true) {
 		action_lock = true;
@@ -138,8 +144,7 @@ void Player::update(float d_time) {
 	//攻撃中は向き変更できない
 	direction_lock = false;
 	if (attack_count > 0) {
-		//move_lock = true;
-		//m_speed.x = 0;
+	
 		direction_lock = true;
 	}
 
@@ -149,9 +154,10 @@ void Player::update(float d_time) {
 
 	function_gravity();
 
-	if (false == knock_back) {
-		jump();
-	}
+	
+	jump();
+	
+	dash();
 
 	update_knock_back();
 
@@ -171,7 +177,6 @@ void Player::update(float d_time) {
 
 void Player::draw()const {
 
-	//get_rect().draw(Palette::Red);
 
 	String image_name = U"player_";
 
@@ -192,18 +197,20 @@ void Player::draw()const {
 		image_name += U"_" + Format(attack_page);
 	}
 
+	float image_ad_x = -15;
+
 	 adjust_x = 0;
 	 adjust_y = 150 - 200;
 
 	if (U"left" == m_direction) {
 
-		adjust_x = 74 - 247;
+		adjust_x = 74 - 247 + image_ad_x;
 
 		TextureAsset(image_name).draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
 	}
 	else if (U"right" == m_direction) {
 
-		adjust_x = 0;
+		adjust_x = 0 + image_ad_x - 4;
 
 		TextureAsset(image_name).mirrored().draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
 	}
@@ -236,12 +243,16 @@ void Player::draw()const {
 		TextureAsset(image_under).mirrored().draw(m_pos.x + adjust_x, m_pos.y + adjust_y);
 	}
 
+
+	//get_rect().draw(Palette::Red);
+
+	
 }
 
 void Player::draw_stick()const {
 
 	//お祓い棒表示
-	if (true == display_stick) {
+	if (true == have_stick) {
 
 		String stick_image = U"stick_";
 
@@ -443,7 +454,7 @@ void Player::jump() {
 	}
 
 	
-	//ジャンプと先行入力の自動ジャンプ
+	//ジャンプと先行入力の自動ジャンプ・開始
 	if ((KeyZ.down() or true == m_now_jump or true==m_bound) and false == action_lock) {
 
 		if (true == can_jump) {
@@ -481,11 +492,12 @@ void Player::jump() {
 
 	//壁キック
 
-
+	//地上にいない
 	if (false == m_is_ground) {
 
 		if (U"left" == m_wall_direction or U"right" == m_wall_direction) {
 
+			//壁キック開始
 			if (KeyZ.down() and false == action_lock) {
 
 				if (U"left" == m_wall_direction) {
@@ -510,6 +522,39 @@ void Player::jump() {
 		}
 	}
 
+	
+	
+	
+
+	//空中操作
+
+	if (m_is_ground == 0) {
+
+		//上昇中andボタンを離している
+		if (m_speed.y < 0 and not KeyZ.pressed() and false==action_lock) {
+
+			// 平滑化時間（小さいと速く目標値 (0.0) に近づく）
+			const double smoothTime = 0.1;
+
+			double m_v2 = 0.0;
+			m_speed.y = Math::SmoothDamp(m_speed.y, 0.0, m_v2, smoothTime, unspecified, m_d_time);
+
+		}
+	}
+
+
+
+	//壁キック判定
+	m_wall_direction = U"none";
+	//バウンド
+	m_bound = false;
+
+
+	
+}
+
+void Player::dash() {
+
 	//ダッシュ
 	if (0 == m_dash_scene) {
 
@@ -517,6 +562,7 @@ void Player::jump() {
 			m_dash_cool_time -= m_d_time;
 		}
 
+		//ダッシュ開始
 		if (KeyC.down() and false == action_lock) {
 
 			if (m_dash_cool_time <= 0) {
@@ -560,7 +606,7 @@ void Player::jump() {
 		if (0.3 < m_dash_count) {
 			end = true;
 		}
-		else if (U"left" == m_dash and U"left"==m_wall_direction) {
+		else if (U"left" == m_dash and U"left" == m_wall_direction) {
 			end = true;
 		}
 		else if (U"right" == m_dash and U"right" == m_wall_direction) {
@@ -591,36 +637,7 @@ void Player::jump() {
 	if (be_dash == true) {
 		violet = 1;
 	}
-	
-	
-
-	//空中操作
-
-	if (m_is_ground == 0) {
-
-		//上昇中andボタンを離している
-		if (m_speed.y < 0 and not KeyZ.pressed() and false==action_lock) {
-
-			// 平滑化時間（小さいと速く目標値 (0.0) に近づく）
-			const double smoothTime = 0.1;
-
-			double m_v2 = 0.0;
-			m_speed.y = Math::SmoothDamp(m_speed.y, 0.0, m_v2, smoothTime, unspecified, m_d_time);
-
-		}
-	}
-
-
-
-	//壁キック判定
-	m_wall_direction = U"none";
-	//バウンド
-	m_bound = false;
-
-
-	
 }
-
 
 void Player::move() {
 
@@ -650,7 +667,7 @@ void Player::move() {
 void Player::update_camera() {
 
 	//左右に60の幅をもたせる
-	m_camera_target.x = Clamp(m_camera_target.x + Math::Sign(m_speed.x) * 120 * m_d_time, -60.0, 60.0);
+	//m_camera_target.x = Clamp(m_camera_target.x + Math::Sign(m_speed.x) * 120 * m_d_time, -60.0, 60.0);
 
 	//m_camera_target.x = m_camera_target.x + Math::Sign(m_speed.x) * 120 * m_d_time;
 

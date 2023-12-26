@@ -14,6 +14,7 @@ public:
 
 	void walk();
 	void jump();
+	void dash();
 	void function_gravity();
 
 	void move();
@@ -73,7 +74,7 @@ public:
 
 
 	//当たり判定用
-	RectF get_hit_rect() { return RectF(m_pos.x + m_adjust_x, m_pos.y + m_adjust_y, m_adjust_w, m_adjust_h); }
+	RectF get_hit_rect()const { return RectF(m_pos.x + m_adjust_x, m_pos.y + m_adjust_y, m_adjust_w, m_adjust_h); }
 
 	//ダメージ
 	void damage() {
@@ -129,6 +130,7 @@ public:
 
 	//色々処理
 	String get_direction() { return m_direction; }
+	void set_direction(String v) { m_direction = v; }
 	void set_coyote_time() { m_coyote_time = 0.2; }
 
 	void start_auto_jump(){
@@ -237,6 +239,7 @@ public:
 
 	bool get_action_lock() { return action_lock; }
 
+	//クールタイム取得
 	bool get_attack() {
 
 		if (attack_count <= 0) {
@@ -263,7 +266,26 @@ public:
 	int get_dash_effect_count() { return dash_effect_count; }
 	void plus_dash_effect_count() { dash_effect_count++; }
 
-	float get_violet()const { return violet; }
+	float get_violet()const {
+
+		return violet;
+
+		if (false == dark_light) {
+			
+		}
+		else {
+
+			if (violet < 0.3) {
+				Print << U"pass";
+				return 1;
+			}
+		}
+
+	}
+
+	void set_have_stick() { have_stick = true; }
+
+	bool get_have_stick()const { return have_stick; }
 
 	//debug用
 	void reset_pos() { m_pos = { 1920 / 2,800 }; }
@@ -387,9 +409,6 @@ private:
 	//アタック中向き変更封じる
 	bool direction_lock = false;
 
-	//お祓い棒表示
-	bool display_stick = true;
-
 	//アタック段階
 	int attack_page = 0;
 
@@ -412,11 +431,15 @@ private:
 	//紫発光
 	float violet = 0;
 
+	//闇発光
+	bool dark_light = true;
+
 	//歩行アニメ
 	int walk_page = 0;
 
 	//歩行アニメカウント
 	float walk_count = 0;
 
-
+	//お祓い棒
+	bool have_stick = false;
 };

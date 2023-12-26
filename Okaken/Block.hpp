@@ -33,7 +33,7 @@ public:
 
 	virtual void draw()const {
 
-		TextureAsset(U"block_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+		//TextureAsset(U"block_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
 
 		/*
 		if (Block_Type::E_Normal == m_type) {
@@ -41,7 +41,9 @@ public:
 			String image_name = U"block_" + m_name;
 			TextureAsset(image_name).draw(m_pos);
 		}*/
-		
+
+		const int32 index = (image_x + image_y * 20);
+		TextureAsset(U"block_{}"_fmt(index)).draw(x * 72, y * 72);
 	}
 
 	virtual RectF get_rect()const { return RectF(m_pos, m_wide, m_height); }

@@ -2,11 +2,17 @@
 
 Game_Manager::Game_Manager() {
 
+	//画面最大化
+	// ウィンドウを最大化
+	Scene::Resize(1920, 1080);
+	Scene::SetResizeMode(ResizeMode::Keep);
+	Window::SetFullscreen(true);
+
 	initialize();
 
 	scene = U"game";
 
-	area = U"first_1";
+	area = U"world_A_1";
 
 	
 
@@ -41,7 +47,10 @@ String Game_Manager::update() {
 				update_menu();
 			}
 			else if (U"event" == scene) {
+
 				update_event();
+				//Event状態更新
+				update_event_state();
 				update_UI();
 			}
 			
@@ -162,6 +171,9 @@ void Game_Manager::update_game() {
 	//Menu起動
 	start_menu();
 
+	//リスポーン登録
+	update_respawn();
+
 	//スクロール処理
 	control_scroll();
 
@@ -177,50 +189,78 @@ void Game_Manager::update_game() {
 
 	//クイックマップ
 	update_show_quick_map();
+
+	
 }
 
 void Game_Manager::draw_game()const {
 
+	/*
 	// レンダーテクスチャを黒色でクリア
-	renderTexture.clear(Palette::Black);
+	renderTexture.clear(ColorF{ 0.0 });
 
-	{
-		auto t = camera.createTransformer();
+	{//アンチエイリアスを消すためにレンダーテクスチャを使う
+		const ScopedRenderStates2D states{ SamplerState::ClampNearest };
+		const ScopedRenderTarget2D target{ renderTexture };
 
-		{//アンチエイリアスを消すためにレンダーテクスチャを使う
-			const ScopedRenderStates2D states{ SamplerState::ClampNearest };
-			const ScopedRenderTarget2D target{ renderTexture };
+		//特殊な背景
+		draw_back_base();
+
+		{
+			auto t = camera.createTransformer();
 
 			draw_tiles();
 			draw_decos();
 			draw_blocks();
 
-			draw_events();	
+			draw_events();
 		}
 	}
 
+
 	renderTexture.draw();
+    */
+
+	//特殊な背景
+	//draw_back_base();
+
+	{
+		auto t = camera.createTransformer();
+
+		draw_tiles();
+		draw_decos();
+		draw_blocks();
+
+		draw_events();
+	}
+
+	Rect blue(0, 0, 1920, 1080);
+	blue.draw(ColorF(0, 0, 1, 0.1));
+
+	//発光するオブジェクト
+	draw_special_objects_light();
+	{
+		auto t = camera.createTransformer();
+		draw_special_object();
+	}
 
 	
 
 	{
 		auto t = camera.createTransformer();
-
 		draw_bullet_enemys();
-		
 	}
 
 	//ダッシュエフェクト
-	draw_dash_effect_light();
-
+	//draw_dash_effect_light();
 	{
 		auto t = camera.createTransformer();
 		draw_dash_effects();
 	}
 
-	//ジャンプエフェクト
-	draw_jump_effect_light();
 
+	//ジャンプエフェクト
+	//draw_jump_effect_light();
 	{
 		auto t = camera.createTransformer();
 		draw_jump_effects();
@@ -228,10 +268,13 @@ void Game_Manager::draw_game()const {
 
 	draw_player_light();
 
+
 	{
 		auto t = camera.createTransformer();
 
 		draw_player();
+
+		//player.get_rect().draw(ColorF(1, 0, 0, 0.5));
 		
 		draw_circle_effects();
 
@@ -247,7 +290,7 @@ void Game_Manager::draw_game()const {
 		
 	}
 	
-
+	
 	
 
 	draw_UI();
@@ -260,6 +303,7 @@ void Game_Manager::draw_game()const {
 		circle.draw(Palette::Green);
 	}
 
+	
 }
 
 
@@ -1319,7 +1363,7 @@ void Game_Manager::vs_player_enemy() {
 
 	for (auto& enemy : enemys) {
 
-		if (player.get_hit_rect().intersects(enemy->get_hit_rect())) {
+		if (player.get_rect().intersects(enemy->get_hit_rect())) {
 
 			//エネミーを待機状態にする
 			enemy->set_state_wait();
@@ -1356,13 +1400,14 @@ void Game_Manager::vs_player_item() {
 			}
 			else if (U"soul" == name) {
 				
-				status.plus_power(1);
-
 				int soul_count = status.get_power();
 
-				soul_bigs.push_back(My_Effect(U"soul_big", 50 + ((soul_count-1) * 70) + 2, 90));
+				if (soul_count < 5) {
 
+					status.plus_power(1);
 
+					soul_bigs.push_back(My_Effect(U"soul_big", 72 + ((soul_count) * 70) + 2, 80));
+				}
 
 			}
 			else if (U"coin" == name){
@@ -1422,6 +1467,10 @@ void Game_Manager::vs_stick_block() {
 			if (block->get_type()==Block_Type::E_Break) {
 
 				if (stick.get_hit_rect().intersects(block->get_rect())) {
+
+					RectF r = block->get_rect();
+
+					my_effects.push_back(My_Effect(U"break_block", r.centerX() - 50, r.centerY() - 50));
 
 					return true;
 				}

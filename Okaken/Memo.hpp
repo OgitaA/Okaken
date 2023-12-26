@@ -6,6 +6,11 @@
 
 //Shopの数が３以下など
 
+//ウィルコインの上限処理
+
+
+
+
 #include<Siv3D.hpp>
 
 class Object {

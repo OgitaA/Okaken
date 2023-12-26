@@ -118,11 +118,12 @@
     <ClCompile Include="Function_Fade.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Make_Stage.cpp" />
     <ClCompile Include="Music.cpp" />
     <ClCompile Include="My_Effect.cpp" />
+    <ClCompile Include="Register_Tiles.cpp" />
     <ClCompile Include="Shop.cpp" />
     <ClCompile Include="Update_Ev.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game_Manager.cpp" />
     <ClCompile Include="Initialize.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -356,7 +357,6 @@
     <ClInclude Include="Editor_Grid.hpp" />
     <ClInclude Include="Enemy.hpp" />
     <ClInclude Include="Enemy_list.hpp" />
-    <ClInclude Include="Game.hpp" />
     <ClInclude Include="Game_Manager.hpp" />
     <ClInclude Include="Have_Item.hpp" />
     <ClInclude Include="Hitotume.hpp" />
@@ -365,6 +365,7 @@
     <ClInclude Include="Jump_Effect.hpp" />
     <ClInclude Include="Kasa.hpp" />
     <ClInclude Include="Light_Bloom.hpp" />
+    <ClInclude Include="LoadDivGragh.cpp" />
     <ClInclude Include="Memo.hpp" />
     <ClInclude Include="Message_Box.hpp" />
     <ClInclude Include="Move_Floor.hpp" />
@@ -384,7 +385,6 @@
     <ClInclude Include="Tem.hpp" />
     <ClInclude Include="Text_Data.hpp" />
     <ClInclude Include="Tile.hpp" />
-    <ClInclude Include="Title.hpp" />
     <ClInclude Include="Needle.hpp" />
     <ClInclude Include="Tool_Selecter.hpp" />
     <ClInclude Include="Tyoutin.hpp" />

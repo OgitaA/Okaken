@@ -15,7 +15,7 @@ public:
 		adjust_w = 72;
 		adjust_h = 72;
 
-		m_hp = 5;
+		m_hp = 32;
 
 		state = State::wait;
 

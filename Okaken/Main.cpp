@@ -1,33 +1,15 @@
-﻿#include"Common.hpp"
-
-#include"Title.hpp"
-#include"Game.hpp"
+﻿#include<Siv3D.hpp>
+#include"Game_Manager.hpp"
 
 void Main()
 {
-	// シーンマネージャーを作成
-	App manager;
-
-	manager.add<Title>(State::Title);
-	manager.add<Game>(State::Game);
-	//manager.add<Title>(State::Title);
-
-	//最初のシーン
-	manager.init(State::Game);
-
-
-	//画面最大化
-	// ウィンドウを最大化
-	Scene::Resize(1920, 1080);
-	Scene::SetResizeMode(ResizeMode::Keep);
-	Window::SetFullscreen(true);
+	
+	Game_Manager game_manager;
 
 	while (System::Update())
 	{
-		if (not manager.update())
-		{
-			break;
-		}
+		game_manager.update();
+		game_manager.draw();
 	}
 }
 

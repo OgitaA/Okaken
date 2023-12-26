@@ -33,6 +33,24 @@ void My_Effect::set_up() {
 
 		page_max = 7;
 	}
+	else if (U"break_block" == name) {
+
+		w = 100;
+		h = 100;
+
+		//初期サイズ
+		size = 1;
+
+		size_up = 0;
+
+		delete_count = 0.3;
+
+
+
+		anime_use = true;
+
+		page_max = 7;
+	}
 	else if (U"soul_big"==name) {
 
 		w = 70;
@@ -97,13 +115,11 @@ void My_Effect::draw()const {
 
 		String image_name = U"effect_" + name;
 
-		
-
 		TextureAsset(image_name).scaled(size).draw(x - adjust_x, y - adjust_y, ColorF(1.0, fade_v));
 
 		
 
-		//TextureAsset(image_name).scaled(size).draw(x, y , ColorF(1.0, fade_v));
+		
 	}
 	else if (anime_use == true) {
 

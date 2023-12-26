@@ -21,7 +21,10 @@ public:
 	void draw()const {
 
 		
-		TextureAsset(U"event_tile")(image_x * 72, image_y * 72, 72, 72).draw(m_pos);
+		//TextureAsset(U"event_tile")(image_x * 72, image_y * 72, 72, 72).draw(m_pos);
+
+		const int32 index = (image_x + image_y * 20);
+		TextureAsset(U"event_{}"_fmt(index)).draw(m_pos);
 	}
 
 	RectF get_rect() { return RectF(m_pos, 72, 72); }

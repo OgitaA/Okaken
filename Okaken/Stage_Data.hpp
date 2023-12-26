@@ -23,7 +23,10 @@ struct Block_Data {
 		//String image_name = U"block_" + name;
 		//TextureAsset(image_name).draw(x * 72, y * 72);
 
-		TextureAsset(U"block_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+		//TextureAsset(U"block_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+
+		const int32 index = (image_x + image_y * 20);
+		TextureAsset(U"block_{}"_fmt(index)).draw(x * 72, y * 72);
 	}
 
 	template <class Archive>
@@ -136,7 +139,10 @@ struct Tile_Data {
 		//String image_name = U"tile_" + name;
 		//TextureAsset(image_name).draw(x * 72, y * 72);
 
-		TextureAsset(U"tile_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+		//TextureAsset(U"tile_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+
+		const int32 index = (image_x + image_y * 20);
+		TextureAsset(U"tile_{}"_fmt(index)).draw(x * 72, y * 72);
 	}
 
 	template <class Archive>
@@ -171,9 +177,10 @@ struct Deco_Data {
 		//TextureAsset(image_name).draw(x * 72, y * 72);
 
 
-		TextureAsset(U"deco_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+		//TextureAsset(U"deco_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
 
-
+		const int32 index = (image_x + image_y * 20);
+		TextureAsset(U"deco_{}"_fmt(index)).draw(x * 72, y * 72);
 	}
 
 	template <class Archive>
@@ -217,7 +224,10 @@ struct Event_Data {
 			TextureAsset(U"event_blue_box").draw(x * 72, y * 72);
 		}
 		else {
-			TextureAsset(U"event_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+			//TextureAsset(U"event_tile")(image_x * 72, image_y * 72, 72, 72).draw(x * 72, y * 72);
+
+			const int32 index = (image_x + image_y * 20);
+			TextureAsset(U"event_{}"_fmt(index)).draw(x * 72, y * 72);
 		}
 	}
 

@@ -71,11 +71,27 @@ void Game_Manager::update_event_main() {
 	else if (22 == event_ID) {
 		ev_exit_first_toilet();
 	}
+
+	else if (100 == event_ID) {
+		ev_get_stick();
+	}
+
+	else if (200 == event_ID) {
+		ev_goback_world_A_1();
+	}
+	else if (201 == event_ID) {
+		ev_go_world_A_2();
+	}
+
+	//Story
 	else if (1001 == event_ID) {
 		ev_story_1();
 	}
 	else if (10000 == event_ID) {
 		ev_update_shop();
+	}
+	else if (99999 == event_ID) {
+		ev_talk_test();
 	}
 	else {
 		end();
@@ -89,7 +105,7 @@ void Game_Manager::ev_save_point() {
 		full_life_player();
 
 		start_message();
-		mes(U"テスト用の文字列だったり");
+		mes(U"・体力が回復した！！\n・セーブした！！");
 
 		next();
 	}
@@ -181,7 +197,34 @@ void Game_Manager::ev_exit_first_toilet() {
 	end();
 }
 
+void Game_Manager::ev_goback_world_A_1() {
+	go_area(U"world_A_1", 72, 10, U"left");
+	end();
+}
 
+void Game_Manager::ev_go_world_A_2() {
+	go_area(U"world_A_2", 6, 8, U"right");
+	end();
+}
+
+void Game_Manager::ev_get_stick() {
+
+	if (0 == ev_scene) {
+
+		start_message();
+		mes(U"<お祓い棒>を手に入れた！！");
+		player.set_have_stick();
+		status.plus_have_ablity(U"stick");
+		event_super.set_var(U"got_stick", 1);
+		next();
+	}
+	else if (1 == ev_scene) {
+		z();
+	}
+	else if (2 == ev_scene) {
+		end();
+	}
+}
 
 
 

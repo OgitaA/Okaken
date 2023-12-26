@@ -182,6 +182,8 @@ void Game_Manager::update_edit() {
 
 void Game_Manager::draw_edit()const {
 
+	draw_back_base();
+
 	{
 		auto t = camera_edit.createTransformer();
 
@@ -210,12 +212,19 @@ void Game_Manager::draw_edit()const {
 			int x = event_data.x*72 + 74 / 2;
 			int y = event_data.y*72 - 30;
 
+			bool exist = false;
 
 			for (auto& event_list : event_lists) {
 
 				if (event_list.ID == ID) {
 					name=event_list.name;
+					exist = true;
+					break;
 				}
+			}
+
+			if (false == exist) {
+				name = Format(ID);
 			}
 
 			FontAsset(U"BIZ_30")(name).drawAt(x, y);
