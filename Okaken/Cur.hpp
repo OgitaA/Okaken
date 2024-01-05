@@ -24,7 +24,12 @@ public:
 	void set_x_max(int v) { x_max = v; }
 	void set_y_max(int v) { y_max = v; }
 
-	void update() {
+	void set_x_zero() { x = 0; }
+	void set_y_zero() { y = 0; }
+
+	void update(int se_volume) {
+
+		bool sound = false;
 
 		float d_time = Scene::DeltaTime();
 
@@ -61,10 +66,12 @@ public:
 				if (KeyLeft.pressed()) {
 					x--;
 					key = true;
+					sound = true;
 				}
 				else if (KeyRight.pressed()) {
 					x++;
 					key = true;
+					sound = true;
 				}
 
 				if (true == key) {
@@ -79,10 +86,12 @@ public:
 				if (KeyUp.pressed()) {
 					y--;
 					key = true;
+					sound = true;
 				}
 				else if (KeyDown.pressed()) {
 					y++;
 					key = true;
+					sound = true;
 				}
 
 				if (true == key) {
@@ -98,6 +107,7 @@ public:
 
 			if (x < 0) {
 				x = x_max;
+				
 			}
 
 			if (x_max < x) {
@@ -108,10 +118,12 @@ public:
 
 			if (x_max<x) {
 				x = x_max;
+				sound = false;
 			}
 
 			if (x < 0) {
 				x = 0;
+				sound = false;
 			}
 		}
 
@@ -129,14 +141,21 @@ public:
 
 			if (y_max < y) {
 				y = y_max;
+				sound = false;
 			}
 
 			if (y < 0) {
 				y = 0;
+				sound = false;
 			}
 		}
 
-		
+		if (true == sound) {
+
+			double volume = double(se_volume) / double(10);
+
+			AudioAsset(U"カーソル").playOneShot(volume);
+		}
 
 	}
 

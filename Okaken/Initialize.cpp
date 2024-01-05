@@ -11,6 +11,7 @@ void Game_Manager::initialize() {
 	initialize_event();
 	initialize_music();
 	initialize_shader();
+	
 	initialize_debug();
 	
 
@@ -35,32 +36,87 @@ void Game_Manager::initialize_data() {
 		set_zone_data(U"sixth");
 
 		set_zone_data(U"under");
+		set_zone_data(U"rooftop");
 
+		set_zone_data(U"yard");
+		set_zone_data(U"gym");
+
+		//チュートリアル
 		set_zone_data(U"world_A");
-
-
+		//
+		set_zone_data(U"world_B");
+		set_zone_data(U"world_C");
+		set_zone_data(U"world_D");
+		set_zone_data(U"world_E");
+		set_zone_data(U"world_F");
+		set_zone_data(U"world_G");
+		set_zone_data(U"world_H");
 
 
 		set_area_data(U"test_room", 72 * 30, 72 * 30,U"test_room");
 
+		//画面より小さいサイズのマップを作るときはマップの端の座標に+1します（0から数えてるので）
+
+
 		//通常マップ
 
-		set_area_data(U"under_1", 72 * 50, 1080, U"under");
-		set_area_data(U"first_1", 72 * 73 + 72 * 24, 1080, U"first");
+		set_area_data(U"under_1", 72 * (73 + 24), 1080, U"under");
+		set_area_data(U"rooftop_1", 72 * (73 + 24), 1080, U"rooftop");
+
+		set_area_data(U"first_1", 72 * 73 + 72 * 24, 1080, U"first", U"日光浴");
 		set_area_data(U"second_1", 72 * 73 + 72 * 24, 1080, U"second");
 		set_area_data(U"third_1", 72 * 73 + 72 * 24, 1080, U"third");
 		set_area_data(U"fourth_1", 72 * 73 + 72 * 24, 1080, U"fourth");
 		set_area_data(U"fifth_1", 72 * 73 + 72 * 24, 1080, U"fifth");
 		set_area_data(U"sixth_1", 72 * 73 + 72 * 24, 1080, U"sixth");
 
-		set_area_data(U"first_toilet", 72 * 50, 1080, U"first");
+		//トイレ
+		set_area_data(U"first_toilet", 72 * 26, 1080, U"first");
+		set_area_data(U"second_toilet", 72 * 50, 1080, U"second");
+		set_area_data(U"third_toilet", 72 * 50, 1080, U"third");
+		set_area_data(U"fourth_toilet", 72 * 50, 1080, U"fourth");
+		set_area_data(U"fifth_toilet", 72 * 50, 1080, U"fifth");
+		set_area_data(U"sixth_toilet", 72 * 50, 1080, U"sixth");
 
+		set_area_data(U"under_toilet", 72 * 50, 1080, U"under");
+
+		//各種部屋
+		//B1
+		set_area_data(U"okaken", 72 * 20, 1080, U"under");
+		set_area_data(U"bunngei", 72 * 20, 1080, U"under");
+		set_area_data(U"sinnbun", 72 * 20, 1080, U"under");
+		set_area_data(U"housou", 72 * 20, 1080, U"under");
+
+		set_area_data(U"tennmon", 72 * 30, 1080, U"under");
+		set_area_data(U"enngeki", 72 * 30, 1080, U"under");
+
+		
+		
 
 		//霊界マップ
 		set_area_data(U"world_A_1", 72 * 80, 1080, U"world_A");
-		set_area_data(U"world_A_2", 72 * 80, 1080, U"world_A");
+		set_area_data(U"world_A_2", 72 * 108, 1080, U"world_A");
 		set_area_data(U"world_A_3", 72 * 80, 1080, U"world_A");
-	
+
+		set_area_data(U"world_B_1", 72 * 80, 1080, U"world_B");
+
+		set_area_data(U"world_C_1", 72 * 80, 1080, U"world_C");
+
+		set_area_data(U"world_D_1", 72 * 80, 1080, U"world_D");
+
+		set_area_data(U"world_E_1", 72 * 80, 1080, U"world_E");
+
+		set_area_data(U"world_F_1", 72 * 80, 1080, U"world_F");
+
+		set_area_data(U"world_G_1", 72 * 80, 1080, U"world_G");
+
+		set_area_data(U"world_H_1", 72 * 80, 1080, U"world_H");
+
+		set_zone_bgm(U"under", U"放課後");
+		set_zone_bgm(U"first", U"放課後");
+		set_zone_bgm(U"world_A", U"六花");
+		
+
 	}
 
 
@@ -105,7 +161,7 @@ void Game_Manager::initialize_data() {
 	//Area
 	{
 		
-
+		//Zone_DataとArea_Dataを渡す
 		area_selecter.set_zone(zone_datas);
 		area_selecter.set_area(area_datas);
 	}
@@ -165,7 +221,7 @@ void Game_Manager::initialize_editor() {
 
 	{
 
-		edit = true;
+		
 
 		scroll_edit = { 1920 / 2,1080 / 2 };
 
@@ -273,6 +329,14 @@ void Game_Manager::initialize_editor() {
 
 void Game_Manager::initialize_image() {
 
+	//Title
+	TextureAsset::Register(U"title_back", U"image/title/back.png");
+	TextureAsset::Load(U"title_back");
+
+	TextureAsset::Register(U"title_cur", U"image/title/cur.png");
+	TextureAsset::Load(U"title_cur");
+
+
 	//Image
 
 	register_tiles(U"block", U"image/block/tile.png", Size{ 72,72 }, 20, 20);
@@ -280,53 +344,7 @@ void Game_Manager::initialize_image() {
 	register_tiles(U"deco", U"image/deco/tile.png", Size{ 72,72 }, 20, 20);
 	register_tiles(U"event", U"image/event/tile.png", Size{ 72,72 }, 20, 20);
 
-	/*
-	//自動読み込み
-	for (auto& box : select_boxs) {
-
-		if (U"block" == box.get_type()) {
-
-			for (auto& block : box.get_data_names()) {
-
-				String name = block;
-				String adress = U"image/block/" + name + U".png";
-
-				String block_name = U"block_" + name;
-
-				TextureAsset::Register(block_name, adress);
-				TextureAsset::Load(block_name);
-			}
-		}
-
-		if (U"tile" == box.get_type()) {
-
-			for (auto& tile : box.get_data_names()) {
-
-				String name = tile;
-				String adress = U"image/tile/" + name + U".png";
-
-				String tile_name = U"tile_" + name;
-
-				TextureAsset::Register(tile_name, adress);
-				TextureAsset::Load(tile_name);
-			}
-		}
-
-		/*
-		if (U"deco" == box.get_type()) {
-
-			for (auto& deco : box.get_data_names()) {
-
-				String name = deco;
-				String adress = U"image/deco/" + name + U".png";
-
-				String deco_name = U"deco_" + name;
-
-				TextureAsset::Register(deco_name, adress);
-				TextureAsset::Load(deco_name);
-			}
-		}
-	}*/
+	
 
 	//リリース時抜く
 	{
@@ -349,27 +367,7 @@ void Game_Manager::initialize_image() {
 
 	
 
-	/*
-
-	TextureAsset::Register(U"block_cream", U"image/block/cream.png");
-	TextureAsset::Load(U"block_cream");
-
-
-	TextureAsset::Register(U"block_wood", U"image/block/wood.png");
-	TextureAsset::Load(U"block_wood");
-
-	TextureAsset::Register(U"block_carpet", U"image/block/carpet.png");
-	TextureAsset::Load(U"block_carpet");
-
-	TextureAsset::Register(U"block_needle", U"image/block/needle.png");
-	TextureAsset::Load(U"block_needle");
-
-	TextureAsset::Register(U"block_slip", U"image/block/slip.png");
-	TextureAsset::Load(U"block_slip");
-
-	TextureAsset::Register(U"block_bound", U"image/block/bound.png");
-	TextureAsset::Load(U"block_bound");
-*/
+	
 
 	
 
@@ -397,10 +395,7 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"effect_break_block_7", U"image/effect/break_block/7.png");
 	TextureAsset::Load(U"effect_break_block_7");
 
-   /*
-   TextureAsset::Register(U"tile_gray_wall", U"image/tile/gray_wall.png");
-   TextureAsset::Load(U"tile_gray_wall");
-   */
+ 
 
 
 	//Player
@@ -607,6 +602,10 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"black", U"image/ui/black.png");
 	TextureAsset::Load(U"black");
 
+	TextureAsset::Register(U"white", U"image/ui/white.png");
+	TextureAsset::Load(U"white");
+
+
 	TextureAsset::Register(U"map_all", U"image/map/map_all.png");
 	TextureAsset::Load(U"map_all");
 
@@ -704,8 +703,16 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"menu_stone", U"image/menu/stone.png");
 	TextureAsset::Load(U"menu_stone");
 
+	//BG
+
 	TextureAsset::Register(U"bg_my_room", U"image/bg/my_room.png");
 	TextureAsset::Load(U"bg_my_room");
+
+	TextureAsset::Register(U"bg_class_room", U"image/bg/class_room.png");
+	TextureAsset::Load(U"bg_class_room");
+
+	TextureAsset::Register(U"bg_dark", U"image/bg/dark.png");
+	TextureAsset::Load(U"bg_dark");
 
 	TextureAsset::Register(U"maga_green", U"image/maga/green.png");
 	TextureAsset::Load(U"maga_green");
@@ -782,11 +789,18 @@ void Game_Manager::initialize_image() {
 	TextureAsset::Register(U"special_object_soul", U"image/other/soul.png");
 	TextureAsset::Load(U"special_object_soul");
 
+	//Back_Base
 	TextureAsset::Register(U"back_base_normal", U"image/back_base/normal.png");
 	TextureAsset::Load(U"back_base_normal");
 
+	TextureAsset::Register(U"back_base_black", U"image/back_base/black.png");
+	TextureAsset::Load(U"back_base_black");
+
 	TextureAsset::Register(U"blue", U"image/back_base/normal.png");
 	TextureAsset::Load(U"blue");
+
+	//Ev
+	TextureAsset::Register(U"title_call", U"image/other/title_call.png");
 }
 
 
@@ -812,8 +826,14 @@ void Game_Manager::initialize_font() {
 	FontAsset::Register(U"BIZ_30", 30, U"font/BIZUDGothic-Regular.ttf");
 	FontAsset::Load(U"BIZ_30", preloadText);
 
+	FontAsset::Register(U"BIZ_MIN_50", 50, U"font/BIZUDPMincho-Regular.ttf");
+	FontAsset::Load(U"BIZ_MIN_50", preloadText);
+
 	FontAsset::Register(U"Mur_50", 50, U"font/Murecho-Bold.ttf");
 	FontAsset::Load(U"Mur_50", preloadText);
+
+	FontAsset::Register(U"Mur_60", 55, U"font/Murecho-Bold.ttf");
+	FontAsset::Load(U"Mur_60", preloadText);
 }
 
 void Game_Manager::initialize_shader() {
@@ -864,6 +884,16 @@ void Game_Manager::initialize_UI() {
 	shop_cur.set_y_max(2);
 	shop_cur.set_off_turn_x();
 	shop_cur.set_off_turn_y();
+
+	title_cur.set_x_max(0);
+	title_cur.set_y_max(3);
+	title_cur.set_off_turn_x();
+	title_cur.set_off_turn_y();
+
+	title_cur_2.set_x_max(0);
+	title_cur_2.set_y_max(2);
+	title_cur_2.set_off_turn_x();
+	title_cur_2.set_off_turn_y();
 }
 
 //イベントの変数を準備
@@ -871,7 +901,10 @@ void Game_Manager::initialize_event() {
 
 	event_super.plus_var(U"display_5", 0);
 
+	event_super.plus_var(U"once_bell", 0);
+
 	event_super.plus_var(U"got_stick", 0);
+	event_super.plus_var(U"end_got_stick", 0);
 }
 
 void Game_Manager::initialize_music() {
@@ -881,9 +914,28 @@ void Game_Manager::initialize_music() {
 	//AudioAsset::Register(bgm[0], Audio::Stream, U"music/bgm/日光浴.ogg", Loop::Yes);
 
 	set_bgm(U"日光浴");
+	set_bgm(U"先生おはようございます");
+	set_bgm(U"六花");
+	set_bgm(U"少女霊");
+	set_bgm(U"放課後");
+
 	set_se(U"お祓い棒");
+	set_se(U"se_jump");
+	set_se(U"se_swing4");
+	set_se(U"少女笑い声");
+	set_se(U"アイテム入手");
+	set_se(U"ブロック破壊");
+	set_se(U"セーブ");
+	set_se(U"教室の戸を開ける");
+	set_se(U"学校のチャイム");
+	set_se(U"お金");
+	set_se(U"鏡移動");
 
+	set_se(U"カーソル");
 
+	set_se(U"決定");
+	set_se(U"キャンセル");
+	
 
 	//AudioAsset::Load(bgm[0]);
 
@@ -891,6 +943,64 @@ void Game_Manager::initialize_music() {
 	// アセットの登録
 	//AudioAsset::Register(U"BGM", U"example/test.mp3");
 	//AudioAsset::Register(U"Sound", GMInstrument::Piano1, PianoKey::A4, 0.5s);
+
+	change_bgm_volume();
+}
+
+
+void Game_Manager::load_first_data() {
+
+	
+}
+
+void Game_Manager::load_save_data() {
+
+	//ゲームデータ(ステータス・イベント)を読み込み
+	load_game();
+
+	//再開(リスタート)場所
+
+	area = status.get_restart_point_area();
+	int x = status.get_restart_point_x();
+	int y = status.get_restart_point_y();
+
+	//地上に合わせる
+	player.set_ground_pos(x, y);
+	player.set_is_ground(true);
+
+
+
+
+	//リスポーン場所
+	respawn_point.area = area;
+	//座標で管理されている
+	respawn_point.x = x / 72;
+	respawn_point.y = y / 72;
+
+
+	retry();
+}
+
+
+
+void Game_Manager::start_game() {
+
+	//ステージデータ読み込み
+	load_area_data();
+
+	//ステージデータからステージを生成
+	make_stage();
+
+	//スクロール調整
+	control_scroll();
+	camera.jumpTo(scroll, 1.0);
+
+}
+
+void Game_Manager::reset_save_data() {
+
+	//loadしていないセーブデータを読み込んで空にします。
+	save_game();
 }
 
 void Game_Manager::initialize_debug() {
@@ -903,8 +1013,8 @@ void Game_Manager::initialize_debug() {
 		status.plus_maga(U"green");
 	}
 
-	status.test();
+	
 
-	status.plus_money(500);
+	//status.plus_money(500);
 
 }

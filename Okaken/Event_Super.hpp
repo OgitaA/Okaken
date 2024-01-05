@@ -22,30 +22,7 @@ struct Event_Var
 	}
 };
 
-//個々のイベント
-struct Event_Sub{
 
-	Event_Sub() {}
-	Event_Sub(String v) {
-
-	}
-
-	template <class Archive>
-	void SIV3D_SERIALIZE(Archive& archive)
-	{
-		archive(ID, scene);
-	}
-
-
-
-	//管理用のタグ
-	String ID = U"none";
-
-	//イベントシーン
-	int scene = 0;
-
-
-};
 
 class Event_Super {
 
@@ -80,17 +57,12 @@ public:
 	template <class Archive>
 	void SIV3D_SERIALIZE(Archive& archive)
 	{
-		archive(m_e_v, m_e_sub);
+		archive(m_e_v);
 	}
 
 private:
 
 	//変数を持つ
 	Array<Event_Var> m_e_v;
-
-	//個々のイベントのデータ
-	Array<Event_Sub> m_e_sub;
-
-
 
 };

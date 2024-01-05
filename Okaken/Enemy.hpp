@@ -12,6 +12,7 @@ public:
 
 	//状態
 	enum State {
+		none,
 		sleep,
 		wait,
 		drift,
@@ -79,6 +80,8 @@ public:
 		}
 	}
 
+	
+
 	RectF get_hit_rect() {
 
 		return RectF(m_pos.x + adjust_x, m_pos.y + adjust_y, adjust_w, adjust_h);
@@ -110,7 +113,13 @@ public:
 
 	void touch_player() { state = State::wait; }
 	void change_state(State s) { state = s; m_count_A = 0; }
-	void set_state_wait() { change_state(State::wait); }
+
+	void set_state() {
+
+		if (touch_player_state != State::none) {
+			change_state(touch_player_state);
+		}
+	}
 
 	void update_common(float d_time,const Player& player) {
 
@@ -168,24 +177,42 @@ public:
 		return false;
 	}
 
-	void set_knock_back(String direction) {
+	void set_knock_back(String set_direction) {
 
-		knock_back = true;
+		if (true == can_knock_back) {
 
-		knock_back_count = 0.5;
+			knock_back = true;
 
-		m_speed = { 0,0 };
+			knock_back_count = 0.5;
 
-		if (U"left" == direction) {
-			m_speed.x = -1500;
+			m_speed = { 0,0 };
+
+			if (U"left" == set_direction) {
+				m_speed.x = -1500;
+			}
+			else if (U"right" == set_direction) {
+				m_speed.x = 1500;
+			}
+
+			if (knock_back_state != State::none) {
+
+				state = knock_back_state;
+
+			}
+
+			m_count_A = 0;
+			
 		}
-		else if (U"right" == direction) {
-			m_speed.x = 1500;
-		}
-
-		
 	}
-	
+
+	void reset_count() {
+
+		m_count_A = 0;
+	}
+
+	void set_wall(String set_direction) {
+		wall = set_direction;
+	}
 
 protected:
 
@@ -275,4 +302,14 @@ protected:
 	bool knock_back = false;
 	float knock_back_count = 0;
 
+	bool can_knock_back = true;
+
+	//ノックバックした時の状態
+	State knock_back_state = State::wait;
+
+	//プレイヤーとの接触した時の状態
+	State touch_player_state = State::wait;
+
+	//壁
+	String wall = U"";
 };

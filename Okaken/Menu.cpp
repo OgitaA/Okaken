@@ -54,7 +54,7 @@ void Game_Manager::draw_menu()const {
 
 void Game_Manager::update_menu_main() {
 
-	menu_cur_main.update();
+	menu_cur_main.update(se_volume);
 
 	int x = menu_cur_main.get_x();
 	int y = menu_cur_main.get_y();
@@ -812,31 +812,7 @@ void Game_Manager::draw_menu_item()const {
 
 	}
 
-	//Weapon
-	for (auto& item : status.get_have_weapons()) {
-
-
-		String image_name = U"weapon_" + item.name;
-		int x = item.x;
-		int y = item.y;
-
-		int blank_x = x;
-		int blank_y = y;
-
-
-
-
-
-		int display_x = edge_x + (x * charm_have_w) + (blank_x * charm_have_w_blank);
-		int display_y = edge_y + (y * charm_have_h) + (blank_y * charm_have_h_blank);
-
-		//Print << U"x::" << display_x;
-		//Print << U"y::" << display_y;
-
-		TextureAsset(image_name).scaled(0.7).draw(display_x, display_y);
-
-
-	}
+	
 
 	//Print << U"=================================";
 

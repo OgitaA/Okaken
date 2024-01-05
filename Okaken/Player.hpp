@@ -19,6 +19,8 @@ public:
 
 	void move();
 
+	void reset_action();
+
 	//座標
 
 	RectF get_rect()const { return RectF(m_pos.x, m_pos.y, m_wide, m_height); }
@@ -148,7 +150,8 @@ public:
 
 	void set_bound() { m_bound = true; }
 
-	void set_ground_pos(int x, int y) { m_pos = { x,y - (m_height - 72) }; }
+	//void set_ground_pos(int x, int y) { m_pos = { x,y - (m_height - 72) }; }
+	void set_ground_pos(int x, int y) { m_pos = { x,y - 150 }; }
 
 	void set_game_over_flag(bool v) { game_over_flag = v; }
 
@@ -287,6 +290,17 @@ public:
 
 	bool get_have_stick()const { return have_stick; }
 
+	bool get_se_jump() {
+
+		bool v = se_jump;
+
+		se_jump = false;
+
+		return v;
+	}
+
+
+
 	//debug用
 	void reset_pos() { m_pos = { 1920 / 2,800 }; }
 
@@ -322,6 +336,9 @@ private:
 
 	//コヨーテタイム
 	float m_coyote_time = 0;
+
+	//ジャンプ効果音
+	bool se_jump = false;
 
 	//ジャンプ・バッファリング
 	bool m_jump_buffering_once = false;

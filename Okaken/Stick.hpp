@@ -6,7 +6,12 @@ class Stick {
 
 public:
 
-	Stick(){}
+	Stick(){
+
+		for (int i = 0; i < 5; i++) {
+			m_hit_triangles.push_back(Triangle());
+		}
+	}
 
 
 
@@ -36,13 +41,15 @@ public:
 				page = 3;
 			}
 
+			/*
 			//判定拡大
 			if (page >= 2) {
 				m_hit_rect = RectF(m_pos, 210, 200);
-			}
+			}*/
 
 
 			//時間経過で判定消滅
+			
 			if (m_delete_count < m_count) {
 				exist = false;
 
@@ -51,6 +58,8 @@ public:
 		}
 	}
 
+	void update_attack(String direction, float x, float y);
+
 	void draw()const {
 
 		if (true == exist) {
@@ -58,61 +67,49 @@ public:
 			String image_name = U"attack_" + Format(page);
 
 			if (U"left"==m_direction) {
-				TextureAsset(image_name).draw(m_pos);
+				TextureAsset(image_name).draw(m_pos_draw);
 			}
 			else if (U"right" == m_direction) {
-				TextureAsset(image_name).mirrored(true).draw(m_pos);
+				TextureAsset(image_name).mirrored(true).draw(m_pos_draw);
 			}
 
 			//m_hit_rect.draw(Palette::Red);
 		}
 	}
 
-	RectF get_hit_rect() { return m_hit_rect; }
+	RectF get_hit_rect()const { return m_hit_rect; }
 
-	void make_attack(String direction,float x,float y) {
+	Array<Triangle> get_hit_triangle()const{
 
-		exist = true;
-		m_direction = direction;
+		Array<Triangle> t;
 
-		if (U"left" == m_direction) {
-			m_pos = { x-210 ,y - 50 };
+		if (page>=2) {
+			t = m_hit_triangles;
 		}
-		else if (U"right" == m_direction) {
-			m_pos = { x,y - 50 };
+		else {
+			for (size_t i = 0; i < 3; i++) {
+				t.push_back(Triangle(m_hit_triangles[i]));
+			}
 		}
 
-	
-
-		//m_hit_rect = RectF(m_pos, 172, 263);
-
-		m_hit_rect = RectF(m_pos, 210, 200/2);
-
-
-
-
-
-		//初期化
-
-		m_count = 0;
-
-		m_delete_count = 0.3;
-
-		page = 0;
-		page_count = 0;
+		return t;
 	}
+
+	void make_attack(String direction, float x, float y);
 
 	bool get_exist() { return exist; }
 
 	String get_direction()const { return m_direction; }
 
-	void set_pos(float x, float y) {
+	void set_pos_draw(float x, float y) {
 
 		if (U"left" == m_direction) {
-			m_pos = { x - 210 ,y - 50 };
+		
+			m_pos_draw = {x - 210 ,y - 50};
 		}
 		else if (U"right" == m_direction) {
-			m_pos = { x,y - 50 };
+
+			m_pos_draw = {x,y - 50};
 		}
 
 		
@@ -120,6 +117,14 @@ public:
 	}
 
 	int get_page() { return page; }
+
+	void reset();
+	void reset_action() {
+
+		reset();
+
+		exist = false;
+	}
 
 private:
 
@@ -129,11 +134,16 @@ private:
 
 	Vec2 m_pos;
 
+	//描画用
+	Vec2 m_pos_draw;
+
 	RectF m_hit_rect;
+
+	Array<Triangle> m_hit_triangles;
 
 	float m_count = 0;
 
-	float m_delete_count = 0;
+	const float m_delete_count = 0.3;
 
 	String m_direction = U"left";
 

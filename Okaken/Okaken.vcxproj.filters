@@ -142,9 +142,6 @@
     <Filter Include="Source Files\Common\Cur">
       <UniqueIdentifier>{c6163b1a-0e86-40fc-a3b4-3b395deb6d8a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Common\Music">
-      <UniqueIdentifier>{fda06c00-f29e-4aa7-9c10-5f420fd2119d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game_Manager">
       <UniqueIdentifier>{00546e1a-3bfc-4577-92e7-be141733ca0e}</UniqueIdentifier>
     </Filter>
@@ -295,6 +292,9 @@
     <Filter Include="Source Files\Game_Manager\Scene\Editor\Stage_Data">
       <UniqueIdentifier>{25d07021-d499-4b28-9eb4-cf22c2cf5a65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game_Manager\Scene\Editor\Parts">
+      <UniqueIdentifier>{5cf0525a-eaea-47ff-98b2-2273bb1d09a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -342,9 +342,6 @@
     <ClCompile Include="Update_Ev_State.cpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Event_Manager\Scene_Event</Filter>
     </ClCompile>
-    <ClCompile Include="Music.cpp">
-      <Filter>Source Files\Common\Music</Filter>
-    </ClCompile>
     <ClCompile Include="Shop.cpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Shop</Filter>
     </ClCompile>
@@ -355,6 +352,12 @@
       <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Make_Stage</Filter>
     </ClCompile>
     <ClCompile Include="Register_Tiles.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Stick.cpp">
+      <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Player\Stick</Filter>
+    </ClCompile>
+    <ClCompile Include="Music.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1016,18 +1019,6 @@
     <ClInclude Include="Item.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Item_Manager\Item</Filter>
     </ClInclude>
-    <ClInclude Include="Editor_Grid.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="My_Slider.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Select_Box.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="My_Button.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
-    </ClInclude>
     <ClInclude Include="Tile.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Tile_Manager\Tile</Filter>
     </ClInclude>
@@ -1044,12 +1035,6 @@
       <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Enemy_Manager\Enemy\Kasa</Filter>
     </ClInclude>
     <ClInclude Include="Status.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Status</Filter>
-    </ClInclude>
-    <ClInclude Include="Have_Charm.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Status</Filter>
-    </ClInclude>
-    <ClInclude Include="Have_Item.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Status</Filter>
     </ClInclude>
     <ClInclude Include="Stick.hpp">
@@ -1079,12 +1064,6 @@
     <ClInclude Include="Break_Block.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Block_Manager\Block</Filter>
     </ClInclude>
-    <ClInclude Include="Detail_Setter.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Equip_Charm.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Status</Filter>
-    </ClInclude>
     <ClInclude Include="Cur.hpp">
       <Filter>Source Files\Common\Cur</Filter>
     </ClInclude>
@@ -1093,9 +1072,6 @@
     </ClInclude>
     <ClInclude Include="Message_Box.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Event_Manager\Scene_Event\Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="Area_Selecter.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
     </ClInclude>
     <ClInclude Include="Area_Data.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_System\Area_Manager</Filter>
@@ -1127,9 +1103,6 @@
     <ClInclude Include="Cleaner.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Enemy_Manager\Enemy\Cleaner</Filter>
     </ClInclude>
-    <ClInclude Include="Tool_Selecter.hpp">
-      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
-    </ClInclude>
     <ClInclude Include="Stage_Data.hpp">
       <Filter>Source Files\Game_Manager\Scene\Editor\Stage_Data</Filter>
     </ClInclude>
@@ -1151,8 +1124,11 @@
     <ClInclude Include="Circle_Effect.hpp">
       <Filter>Source Files\Game_Manager\Scene\Game\Game_Obejct\Circle_Effect_Manager</Filter>
     </ClInclude>
-    <ClInclude Include="LoadDivGragh.cpp">
-      <Filter>Source Files\Common</Filter>
+    <ClInclude Include="My_GUI.hpp">
+      <Filter>Source Files\Game_Manager\Scene\Editor\My_GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts.hpp">
+      <Filter>Source Files\Game_Manager\Scene\Editor\Parts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

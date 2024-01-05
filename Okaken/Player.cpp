@@ -9,115 +9,125 @@ void Player::reset() {
 
 	m_d_time = 0;
 
+	//座標
 	m_pos = { 1920 / 2,900 - 200 };
 	m_pos_old = m_pos;
 
-	//m_wide = 74;
+	//あたり判定
 	m_wide = 40;
 	m_height = 150;
 
-	
+    //当たり判定用(だが、結局使ってない…)
+	m_adjust_w = 100;
+	m_adjust_h = 100;
 
+	//向き
 	m_direction = U"right";
+
+	//カメラ
+	m_camera_target = { 0,0 };
+	
+	//ゲームオーバー用
+	game_over_flag = false;
+
+
+	//試験的地上判定
+	m_is_ground = false;
+
+	//注意！！debug用
+	can_double_jump = true;
+
+	have_stick = false;
+
+	reset_action();
+}
+
+void Player::reset_action() {
 
 	m_speed = { 0,0 };
 
 
+    //状態
+	m_state = U"wait";
+
+	//ジャンプ関連
 	m_coyote_time = 0;
 
 	m_jump_buffering_once = false;
 	m_jump_buffering = 0;
+	m_jump = false;
+	m_jump_buffering_scene = 0;
+	m_jump_buffering_triger = false;
+
+	m_now_jump = false;
+
 	
-	 m_jump = false;
-	 m_jump_buffering_scene = 0;
-     m_jump_buffering_triger = false;
 
-	 m_now_jump = false;
+	se_jump = false;
 
-	 m_is_ground = false;
+    //2段ジャンプ
+	jump_count = 0;
+	just_double_jump = false;
 
-	m_camera_target = { 0,0 };
-
-	//当たり判定用
-	m_adjust_w = 100;
-	m_adjust_h = 100;
-
-
-	//無敵
-	m_muteki_count = 0;
-
-	//壁ジャンプ
+    //壁ジャンプ
 	m_wall_direction = U"none";
 
+    //跳ねる
+	m_bound = false;
+
+	//滑る用
+	m_slip = false;
+
+	
 	//ダッシュ
 	m_dash = U"none";
 	m_dash_scene = 0;
 	m_dash_count = 0;
 	m_dash_cool_time = 0;
 
-	//滑る用
-	m_slip = false;
+	//ダッシュエフェクト
+	be_dash = false;
+	dash_count = 0;
+	dash_effect_count = 0;
 
-	//跳ねる
-	m_bound = false;
+	//無敵
+	m_muteki_count = 0;
 
-	//ゲームオーバー用
-	game_over_flag = false;
+	//アタック
+	attack_count = 0;
+	attack_page = 0;
+	direction_lock = false;
 
-	//状態
-	m_state = U"wait";
-
-	//アニメ
-	anime_page = 0;
-	anime_count = 0;
 
 	//ぶっとび
 	knock_back = false;
 	knock_back_count = 0;
 	knock_back_direction = U"right";
 
-	//シェーダー
+
+
+    //歩行アニメ
+	walk_page = 0;
+	walk_count = 0;
+
+	//アニメ
+	anime_page = 0;
+	anime_count = 0;
+
+	//赤シェーダー
 	red = 0;
 	red_flag = 0;
 	red_count = 0;
 	red_count_2 = 12;
 
-	//2段ジャンプ
-	jump_count = 0;
-
-
-	//注意！！debug用
-	can_double_jump = true;
-
-	just_double_jump = false;
-
-
-	direction_lock = false;
-
-	
-
-	//アタック
-	attack_count = 0;
-
-	attack_page = 0;
-
-	//ダッシュエフェクト
-	be_dash = false;
-
-	dash_count = 0;
-
-	dash_effect_count = 0;
-
-	//紫
+	//紫シェーダー
 	violet = 0;
 	dark_light = true;
 
-	//歩行アニメ
-	walk_page = 0;
-	walk_count = 0;
-
-	have_stick = false;
+		
+	
 }
+
 
 
 void Player::update(float d_time) {
@@ -233,6 +243,8 @@ void Player::draw()const {
 	else {
 		image_under += U"jump";
 	}
+
+	
 
 	if (U"left" == m_direction) {
 
@@ -463,6 +475,9 @@ void Player::jump() {
 
 			//ハイジャンプ
 			if (KeyZ.down() or true == m_now_jump) {
+
+				se_jump = true;
+
 				if (true == m_bound) {
 					high_jump = true;
 				}
@@ -676,3 +691,4 @@ void Player::update_camera() {
 	
 
 }
+

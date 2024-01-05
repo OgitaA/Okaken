@@ -1,40 +1,59 @@
 ﻿#pragma once
 #include<Siv3D.hpp>
 
-#include"Equip_Charm.hpp"
-
-#include"Have_Charm.hpp"
-#include"Have_Item.hpp"
-
-struct Have_Weapon {
-
-	Have_Weapon(String set_name, int set_x,int set_y) {
-		name = set_name;
-		x = set_x;
-		y = set_y;
-	}
-
-	String name = U"";
-	int x = 0;
-	int y = 0;
-
-	template <class Archive>
-	void SIV3D_SERIALIZE(Archive& archive)
-	{
-		archive(name, x, y);
-	}
-};
-
 struct Have_Maga {
 
-	Have_Maga(String set_name,int set_x) {
+	Have_Maga(){}
+	Have_Maga(String set_name, int set_x) {
 		name = set_name;
 		x = set_x;
 	}
 
 	String name = U"";
 	int x = 0;
-	int y = 0;
+
+	template <class Archive>
+	void SIV3D_SERIALIZE(Archive& archive)
+	{
+		archive(name, x);
+	}
+};
+
+
+struct Equip_Charm {
+
+	Equip_Charm() {}
+	Equip_Charm(String set_name, int set_x) {
+		name = set_name;
+		x = set_x;
+	}
+
+	String name;
+	int x;
+
+	template <class Archive>
+	void SIV3D_SERIALIZE(Archive& archive)
+	{
+		archive(name, x);
+	}
+
+};
+
+
+struct Have_Charm {
+
+	Have_Charm() {}
+	Have_Charm(String set_name, int set_x, int set_y) :
+		name(set_name),
+		x(set_x),
+		y(set_y)
+	{
+	}
+
+	String name;
+	int x;
+	int y;
+
 
 	template <class Archive>
 	void SIV3D_SERIALIZE(Archive& archive)
@@ -42,6 +61,75 @@ struct Have_Maga {
 		archive(name, x, y);
 	}
 };
+
+
+struct Have_Item {
+
+	Have_Item() {}
+	Have_Item(String set_name, int set_x, int set_y) :
+		name(set_name),
+		x(set_x),
+		y(set_y)
+	{
+	}
+
+	String name;
+	int x;
+	int y;
+
+	void plus_number(int v) {
+
+		number += v;
+
+		if (number > number_max) {
+			number = number_max;
+		}
+	}
+
+	bool minus_number(int v) {
+
+		number -= v;
+
+		if (number < 0) {
+			number = 0;
+		}
+
+		return true;
+	}
+
+	int get_number() { return number; }
+
+	template <class Archive>
+	void SIV3D_SERIALIZE(Archive& archive)
+	{
+		archive(name, x, y, number);
+	}
+
+
+
+private:
+
+	int number = 0;
+	int number_max = 99;
+
+};
+
+struct Restart_Point {
+
+	String area;
+
+	int x;
+	int y;
+
+	template <class Archive>
+	void SIV3D_SERIALIZE(Archive& archive)
+	{
+		archive(area, x, y);
+	}
+
+};
+
+
 
 
 
@@ -57,31 +145,7 @@ public:
 		
 	}
 
-	//Test
-	void test() {
-		for (int i = 0; i < 24; i++) {
-			plus_have_charm(U"金運上昇");
-		}
-
-		/*
-		for (int i = 0; i < 3; i++) {
-			plus_maga(U"緑の勾玉");
-		}
-
-		for (int i = 0; i < 30; i++) {
-			plus_weapon(U"お祓い棒");
-		}
-
-		String name = U"";
-
-		for (int i = 0; i < 3; i++) {
-
-			
-
-			plus_have_item(U"カギ",1);
-		}*/
-
-	}
+	
 
 	//Money
 
@@ -172,22 +236,7 @@ public:
 
 		bool exist = false;
 
-		/*
-
-		//すでにある？？
-		for (auto& item : have_items) {
-
-			if (name == item.name) {
-				exist = true;
-
-				//数を増やす
-				item.plus_number(v);
-
-				break;
-			}
-		}
-
-		*/
+		
 
 		//まだない
 		if (false == exist) {
@@ -331,112 +380,6 @@ public:
 
 
 	Array<Have_Maga> get_have_magas()const { return have_magas; }
-
-
-
-	//Have_Weapon
-	void plus_weapon(String set_name) {
-
-		/*
-
-		int x_max = 0;
-
-		for (auto& have_weapon : have_weapons) {
-
-			if (have_weapon.x > x_max) {
-				x_max = have_weapon.x;
-			}
-		}
-
-		int v = x_max + 1;
-
-		have_weapons.push_back(Have_Weapon(set_name, v));
-
-		
-
-        */
-
-		/*
-
-		//すでにある？？
-		for (auto& item : have_items) {
-
-			if (name == item.name) {
-				exist = true;
-
-				//数を増やす
-				item.plus_number(v);
-
-				break;
-			}
-		}
-
-		*/
-
-		bool exist = false;
-
-		//まだない
-		if (false == exist) {
-
-			int memo_x = -1;
-			int memo_y = -1;
-
-			bool go_break = false;
-
-			for (int y = 0; y < 4; y++) {
-				for (int x = 0; x < 5; x++) {
-
-					bool exist = false;
-
-					for (auto& weapon : have_weapons) {
-
-						//ある
-						if (x == weapon.x and y == weapon.y) {
-							exist = true;
-							break;
-						}
-					}
-
-					//無い
-					if (false == exist) {
-						memo_x = x;
-						memo_y = y;
-
-						go_break = true;
-						break;
-					}
-				}
-
-				if (true == go_break) {
-					break;
-				}
-			}
-
-
-			if (-1 == memo_x and -1 == memo_y) {
-				Print << U"満杯です！！";
-			}
-			else {
-				have_weapons.push_back(Have_Weapon(set_name, memo_x, memo_y));
-			}
-
-		}
-
-	}
-
-	Array<Have_Weapon> get_have_weapons()const { return have_weapons; }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	//Have_Item
@@ -583,15 +526,36 @@ public:
 		shop_solds.push_back(data);
 	}
 
-	//ability
-
-	void plus_have_ablity(String set_name) {
-
-		have_ability.push_back(set_name);
+	void set_first_used() {
+		first = false;
 	}
 
-	Array<String> get_have_ability()const {
-		return have_ability;
+	bool get_first() {
+		return first;
+	}
+
+	void set_restart_point(String set_area,int set_x,int set_y) {
+		restart_point.area = set_area;
+		restart_point.x = set_x;
+		restart_point.y = set_y;
+	}
+
+	String get_restart_point_area() {
+		return restart_point.area;
+	}
+
+	int get_restart_point_x() {
+		return restart_point.x;
+	}
+
+	int get_restart_point_y() {
+		return restart_point.y;
+	}
+
+	template <class Archive>
+	void SIV3D_SERIALIZE(Archive& archive)
+	{
+		archive(m_money, m_life, m_life_max, have_magas, equip_charms, have_charms, have_items, shop_solds, restart_point, first);
 	}
 
 
@@ -606,21 +570,21 @@ private:
 	float m_power = 3;
 	int m_power_max = 5;
 
+	//Menu系統
+	Array<Have_Maga> have_magas;
+
 	Array<Equip_Charm> equip_charms;
 	Array<Have_Charm> have_charms;
 
-	Array<Have_Maga> have_magas;
-	Array<Have_Weapon> have_weapons;
 	Array<Have_Item> have_items;
 
+	//すでに売られた商品
 	Array<String> shop_solds;
 
-	//能力
-	Array<String> have_ability;
+	//リスタート場所
+	Restart_Point restart_point;
 
-	template <class Archive>
-	void SIV3D_SERIALIZE(Archive& archive)
-	{
-		archive(m_money, m_life, m_life_max, equip_charms, have_items, have_charms,shop_solds);
-	}
+	//初期化データか
+	bool first = true;
+
 };

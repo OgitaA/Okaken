@@ -10,28 +10,51 @@ Game_Manager::Game_Manager() {
 
 	initialize();
 
-	scene = U"game";
+	scene = U"title";
 
-	area = U"world_A_1";
+	area = U"under_1";
 
-	
+	develop = true;
 
-	camera.jumpTo(player.get_camera_target_pos(), 1.0);
+	//開発用
+	if (true == develop) {
 
-	load_area_data();
-	
-	camera_edit.jumpTo({ scroll_edit.x + 1920 / 2,scroll_edit.y + 1080 / 2 }, 1.0);
-	
+		//sceneもゲームから
+		scene = U"game";
 
-	if (false==edit) {
-		make_stage();
-	}
+		//Editorを最初から使う
+		edit = true;
 
-	//デバッグ用
-	make_area_edit();
+		//Editor用初期化
+		{
+			load_area_data();
+
+			make_area_edit();
+
+			camera_edit.jumpTo({ scroll_edit.x + 1920 / 2,scroll_edit.y + 1080 / 2 }, 1.0);
+		}
+
+		//camera.jumpTo(player.get_camera_target_pos(), 1.0);
+
+	}	
 }
 
-String Game_Manager::update() {
+void Game_Manager::update() {
+
+	if (KeyD.down()) {
+		if (false == develop) {
+			develop = true;
+		}
+		else if (true == develop) {
+			develop = false;
+		}
+	}
+
+	//開発中出ない場合カーソルを消す
+	if (false == develop) {
+		//Cursor::RequestStyle(CursorStyle::Hidden);
+	}
+
 
 	Delta_Time = Scene::DeltaTime() * Game_Speed;
 
@@ -41,17 +64,24 @@ String Game_Manager::update() {
 		if (false == edit) {
 
 			if (U"game" == scene) {
+
 				update_game();
 			}
 			else if (U"menu" == scene) {
+
 				update_menu();
 			}
-			else if (U"event" == scene) {
+
+			if (U"event" == scene) {
 
 				update_event();
 				//Event状態更新
 				update_event_state();
 				update_UI();
+			}
+
+			if (U"title" == scene) {
+				update_title();
 			}
 			
 		}
@@ -82,14 +112,6 @@ String Game_Manager::update() {
 
 	update_se_main();
 
-
-
-	//テスト用
-	if (KeyT.down()) {
-		return U"title";
-	}
-
-	return U"None";
 }
 
 void Game_Manager::draw()const {
@@ -107,7 +129,10 @@ void Game_Manager::draw()const {
 			draw_event();
 
 		}
-		
+
+		if (U"title" == scene) {
+			draw_title();
+		}
 		
 	}
 	else if (true == edit) {
@@ -133,7 +158,7 @@ void Game_Manager::update_game() {
 	update_blocks(d_time);
 
 	//Player
-	player.update(d_time);
+	update_player(d_time);
 	attack();
 	stick.update(d_time);
 	update_jump_effects(d_time);
@@ -174,13 +199,15 @@ void Game_Manager::update_game() {
 	//リスポーン登録
 	update_respawn();
 
-	//スクロール処理
-	control_scroll();
+
 
 	//ゲームオーバー処理
 	check_game_over();
 	update_game_over(d_time);
 
+
+	//スクロール処理
+	control_scroll();
 	//スクロール処理2
 	camera.jumpTo(scroll, 1.0);
 
@@ -222,7 +249,7 @@ void Game_Manager::draw_game()const {
     */
 
 	//特殊な背景
-	//draw_back_base();
+	draw_back_base();
 
 	{
 		auto t = camera.createTransformer();
@@ -234,8 +261,11 @@ void Game_Manager::draw_game()const {
 		draw_events();
 	}
 
-	Rect blue(0, 0, 1920, 1080);
-	blue.draw(ColorF(0, 0, 1, 0.1));
+	if (true == world_blue) {
+		Rect blue(0, 0, 1920, 1080);
+		blue.draw(ColorF(0, 0, 1, 0.1));
+	}
+
 
 	//発光するオブジェクト
 	draw_special_objects_light();
@@ -297,10 +327,13 @@ void Game_Manager::draw_game()const {
 
 	draw_show_quick_map();
 
-	//カメラデバッグ用
-	{
-		Circle circle(1920 / 2, 1080 / 2, 5);
-		circle.draw(Palette::Green);
+	if (true == develop) {
+
+		//カメラデバッグ用
+		{
+			Circle circle(1920 / 2, 1080 / 2, 5);
+			circle.draw(Palette::Green);
+		}
 	}
 
 	
@@ -806,20 +839,24 @@ void Game_Manager::vs_enemys() {
 
 							enemy->set_x(b_rect.x - enemy->get_wide());
 
+							enemy->set_wall(U"right");
+
 							turn = true;
 
 							hit_x = true;
 						}
 					}
 
-					//プレイヤーが左に移動している時
+					//エネミーが左に移動している時
 					else if (move_x < 0) {
 
-						//X軸のみ動かしたプレイヤーとブロックの判定
+						//X軸のみ動かしたエネミーとブロックの判定
 						if (e_rect_moved_x.intersects(b_rect)) {
 
 							enemy->set_x(b_rect.x + b_rect.w);
 
+							enemy->set_wall(U"left");
+
 							turn = true;
 
 							hit_x = true;
@@ -827,16 +864,16 @@ void Game_Manager::vs_enemys() {
 					}
 
 
-					//プレイヤーが下に移動している時
+					//エネミーが下に移動している時
 					if (move_y > 0) {
 
-						//Y軸のみ動かしたプレイヤーとブロックの判定
+						//Y軸のみ動かしたエネミーとブロックの判定
 						if (e_rect_moved_y.intersects(b_rect)) {
 
 							enemy->set_y(b_rect.y - enemy->get_height());
 
 
-							//プレイヤーが地面に接触
+							//エネミーが地面に接触
 							enemy->set_is_ground(true);
 
 							//重力加速度を無くす
@@ -846,10 +883,10 @@ void Game_Manager::vs_enemys() {
 						}
 					}
 
-					//プレイヤーが上に移動している時
+					//エネミーが上に移動している時
 					else if (move_y < 0) {
 
-						//Y軸のみ動かしたプレイヤーとブロックの判定
+						//Y軸のみ動かしたエネミーーとブロックの判定
 						if (e_rect_moved_y.intersects(b_rect)) {
 
 							enemy->set_y(b_rect.y + b_rect.h);
@@ -898,7 +935,7 @@ void Game_Manager::vs_enemys() {
 									enemy->set_y(b_rect.y - enemy->get_height());
 
 
-									//プレイヤーが地面に接触
+									//エネミーーが地面に接触
 									enemy->set_is_ground(true);
 
 									//重力加速度を無くす
@@ -1042,6 +1079,7 @@ void Game_Manager::vs_enemys() {
 		if (true == turn) {
 
 			enemy->turn_direction();
+		
 		}
 
 	}
@@ -1055,7 +1093,7 @@ void Game_Manager::vs_items() {
 
 
 
-		//エネミーとブロック
+		//アイテムとブロック
 
 		RectF i_rect = item.get_rect();
 		RectF i_rect_old = item.get_rect_old();
@@ -1365,12 +1403,12 @@ void Game_Manager::vs_player_enemy() {
 
 		if (player.get_rect().intersects(enemy->get_hit_rect())) {
 
-			//エネミーを待機状態にする
-			enemy->set_state_wait();
+			//エネミーの状態を変更する
+			enemy->set_state();
 
 			String direction = U"";
 
-			if (enemy->get_hit_rect().x <= player.get_hit_rect().x) {
+			if (enemy->get_hit_rect().x <= player.get_rect().x) {
 
 				direction = U"right";
 			}
@@ -1416,6 +1454,8 @@ void Game_Manager::vs_player_item() {
 			
 				//status.plus_money(v);
 				plus_will_money(v);
+
+				play_se(U"お金");
 			}
 			else {
 				//status.plus_item(item.get_name(), 1);
@@ -1434,9 +1474,19 @@ void Game_Manager::vs_stick_enemy() {
 
 		for (auto& enemy : enemys) {
 
-			if (stick.get_hit_rect().intersects(enemy->get_hit_rect())) {
+
+			bool hit = false;
+
+			for (auto& tri : stick.get_hit_triangle()) {
+
+				if (tri.intersects(enemy->get_hit_rect())) {
+					hit = true;
+					break;
+				}
+			}
 
 				
+			if (true == hit) {
 
 				if (enemy->get_muteki() == false) {
 
@@ -1446,9 +1496,9 @@ void Game_Manager::vs_stick_enemy() {
 
 					magnification += 0.2 * status.get_power();
 
-					power*= magnification;
+					power *= magnification;
 
-					
+
 
 					enemy->damage(power);
 					enemy->set_knock_back(stick.get_direction());
@@ -1464,16 +1514,31 @@ void Game_Manager::vs_stick_block() {
 
 		blocks.remove_if([&](const auto& block) {
 
-			if (block->get_type()==Block_Type::E_Break) {
+			if (block->get_type() == Block_Type::E_Break) {
 
-				if (stick.get_hit_rect().intersects(block->get_rect())) {
+				bool hit = false;
+
+				for (auto& tri : stick.get_hit_triangle()) {
+
+					if (tri.intersects(block->get_rect())) {
+						hit = true;
+						break;
+					}
+				}
+
+
+
+				if (true == hit) {
 
 					RectF r = block->get_rect();
 
 					my_effects.push_back(My_Effect(U"break_block", r.centerX() - 50, r.centerY() - 50));
 
+					play_se(U"ブロック破壊");
+
 					return true;
 				}
+
 			}
 
 		return false;

@@ -16,7 +16,7 @@ void Game_Manager::ev_update_shop() {
 		int amount = shop_goods.size() - 1;
 
 		shop_cur.set_y_max(amount);
-		shop_cur.update();
+		shop_cur.update(se_volume);
 
 		//Print << U"y::" << shop_cur.get_y();
 

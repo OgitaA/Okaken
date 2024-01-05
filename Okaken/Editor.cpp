@@ -67,6 +67,8 @@ void Game_Manager::update_edit() {
 
 		}
 
+		//特殊な処理
+
 		//リセット
 		if (KeyControl.pressed() and KeyC.pressed()) {
 			tile_datas.clear();
@@ -91,6 +93,22 @@ void Game_Manager::update_edit() {
 		else if (KeyControl.pressed() and KeyUp.down()) {
 
 			move_area_data(0, -1);
+		}
+
+		if (KeyT.pressed() and KeyC.down()) {
+			tile_datas.clear();
+			Print << U"clear_tile_data";
+		}
+
+		if (KeyS.pressed() and KeyUp.pressed()) {
+			for (auto& box : select_boxs) {
+				box.up_down(-1);
+			}
+		}
+		else if (KeyS.pressed() and KeyDown.pressed()) {
+			for (auto& box : select_boxs) {
+				box.up_down(+1);
+			}
 		}
 
 		camera_edit.jumpTo({ scroll_edit.x + 1920 / 2 ,scroll_edit.y + 1080 / 2 }, 1.0);

@@ -17,10 +17,12 @@
 
 //ブロックタイプ
 #include"Block_Type.hpp"
-#include"Needle.hpp"
-#include"Slip_Block.hpp"
 #include"Bound_Block.hpp"
 #include"Break_Block.hpp"
+#include"Needle.hpp"
+#include"Slip_Block.hpp"
+
+
 
 //List
 #include"Enemy_list.hpp"
@@ -33,18 +35,13 @@
 #include"Area_Map.hpp"
 
 //Edit
-#include"Editor_Grid.hpp"
-#include"My_Slider.hpp"
-#include"Select_Box.hpp"
-#include"My_Button.hpp"
-#include"Detail_Setter.hpp"
-#include"Area_Selecter.hpp"
-#include"Tool_Selecter.hpp"
+#include"My_GUI.hpp"
+#include"Parts.hpp"
+
 
 //Status
 #include"Status.hpp"
-#include"Have_Charm.hpp"
-#include"Equip_Charm.hpp"
+
 
 //Action
 #include"Stick.hpp"//お祓い棒クラス
@@ -92,14 +89,17 @@ public:
 	void initialize_data();
 	void initialize_music();
 
+	void load_first_data();
+	void load_save_data();
+
+	bool once_bgm = false;
+
 
 	void initialize_debug();
 
-	void load_div_gragh(const String& name,const FilePath& path, const Size& size);
-
 	void register_tiles(const String& name,const FilePathView path, const Size& regionSize, int32 xCount, int32 yCount);
 
-	String update();
+	void update();
 	void draw()const;
 
 
@@ -114,6 +114,8 @@ public:
 
 
 private:
+
+	bool develop = false;
 
 	float Delta_Time;
 	float Game_Speed = 1;
@@ -130,8 +132,31 @@ private:
 
 		fade_scene_type = U"scene";
 		fade_scene_go_scene = go_scene;
+
 	}
 
+	void change_scene_and_bgm(String go_scene,String set_bgm) {
+
+		initialize_fade();
+
+		fade_scene_type = U"scene";
+		fade_scene_go_scene = go_scene;
+
+		fade_scene_bgm = set_bgm;
+	}
+
+	void change_scene_and_bgm_and_se(String go_scene, String set_bgm,String set_se) {
+
+		initialize_fade();
+
+		fade_scene_type = U"scene";
+		fade_scene_go_scene = go_scene;
+
+		fade_scene_bgm = set_bgm;
+		fade_scene_se = set_se;
+	}
+
+	
 
 
 	void update_menu();
@@ -141,6 +166,7 @@ private:
 	void draw_event()const;
 	bool lock_draw_game = false;
 
+	
 
 	Array<String> zone_datas;
 	void set_zone_data(String set_name) {
@@ -153,6 +179,20 @@ private:
 	void set_area_data(String set_name,int set_w,int set_h,String set_zone) {
 		area_datas.push_back(Area_Data(set_name, set_w, set_h, set_zone));
 	}
+	void set_area_data(String set_name, int set_w, int set_h, String set_zone,String set_bgm) {
+		area_datas.push_back(Area_Data(set_name, set_w, set_h, set_zone, set_bgm));
+	}
+
+	//まとめて音楽を設定します
+	void set_zone_bgm(String set_zone,String set_bgm) {
+
+		for (auto& data : area_datas) {
+			if (data.belong_zone == set_zone) {
+				data.bgm = set_bgm;
+			}
+		}
+	}
+
 
 	int area_wide = 0;
 	int area_height = 0;
@@ -190,7 +230,9 @@ private:
 		//scroll.y = int(player.get_camera_target_pos().y);
 		
 
+		//スクロール制限
 
+		//マップが画面より広い・同じ場合の端
 
 		if ((scroll.x - 1920 / 2) < 0) {
 			scroll.x = 1920 / 2;
@@ -205,6 +247,13 @@ private:
 
 		if ((scroll.y + 1080 / 2) > area_height) {
 			scroll.y = area_height - 1080 / 2;
+		}
+
+		//マップが画面より狭い場合
+
+		if (area_wide < 1920) {
+			//Print << U"area_wide::" << area_wide;
+			scroll.x = area_wide / 2;
 		}
 
 	}
@@ -240,6 +289,15 @@ private:
 
 	//Player
 	Player player;
+	void update_player(float d_time) {
+
+		player.update(d_time);
+
+		if (player.get_se_jump() == true) {
+			
+			play_se(U"se_jump");
+		}
+	}
 	void draw_player()const {
 
 		//プレイヤーと点滅表示
@@ -976,7 +1034,7 @@ private:
 
 	void make_stage();
 
-	
+	void make_stage_back();
 
 	void make_stage_plus();
 
@@ -988,32 +1046,22 @@ private:
 	void attack() {
 
 
+		String direction = player.get_direction();
+		float x = player.get_rect().x + player.get_rect().w / 2;
+		float y = player.get_rect().y;
+
 		if (KeyX.down() == true) {
 
 			if (player.get_have_stick() == true) {
 
 				if (false == player.get_action_lock() and false == game_over_flag and player.get_attack()) {
 
-					String direction = player.get_direction();
-					float x = 0;
-					float y = 0;
-
-					/*
-					if (direction == U"left") {
-						x = player.get_rect().x;
-					}
-					else if (direction == U"right") {
-						x = player.get_rect().x + player.get_rect().w;
-					}*/
-
-					x = player.get_rect().x + player.get_rect().w / 2;
-
-					y = player.get_rect().y;
 
 					stick.make_attack(direction, x, y);
 
-
 					player.set_attack_cool_time();
+
+					play_se(U"se_swing4");
 				}
 			}
 		}
@@ -1021,14 +1069,9 @@ private:
 		//お祓い棒関係の描画補正
 		if (stick.get_exist()) {
 
-			float x = 0;
-			float y = 0;
+			
 
-			x = player.get_rect().x + player.get_rect().w / 2;
-
-			y = player.get_rect().y;
-
-			stick.set_pos(x,y);
+			stick.set_pos_draw(x,y);
 
 
 			//プレイヤーの描画用
@@ -1039,6 +1082,9 @@ private:
 			player.set_attack_page(page);
 
 		}
+
+		//あたり判定の調整
+		stick.update_attack(direction, x, y);
 	}
 
 	//Text_Data
@@ -1090,6 +1136,10 @@ private:
 	void save_area_data();
 	void load_area_data();
 
+	
+
+
+	//各種地形データからオブジェクトを生成
 	void make_area_edit() {
 
 		block_datas.clear();
@@ -1760,6 +1810,8 @@ private:
 
 
 		status.plus_have_item(set_name, x, y);
+
+		play_se(U"アイテム入手");
 	}
 
 	
@@ -1773,6 +1825,8 @@ private:
 	//Event
 
 	Event_Super event_super;
+
+	float Ev_Delta_Time;
 
 	Message_Box message_box;
 	bool message_box_on = false;
@@ -1798,6 +1852,9 @@ private:
 
 	String ev_bg = U"";
 
+	int ev_x = 0;
+	int ev_y = 0;
+
 	void start_event() {
 
 		bool auto_start = false;
@@ -1820,6 +1877,10 @@ private:
 
 						//初期化
 						ev_scene = 0;
+
+						//x,y
+						ev_x = event.get_rect().x;
+						ev_y = event.get_rect().y;
 					}
 				}
 			}
@@ -1844,18 +1905,46 @@ private:
 	void z() {
 
 		if (KeyZ.down()) {
-			ev_scene++;
+
+			if (true == message_box.check_end()) {
+				ev_scene++;
+				z_common();
+			}
+			else {
+				message_box.show_all_text();
+			}
+
+			
 		}
 	}
 
 	void z(int v) {
 
 		if (KeyZ.down()) {
-			ev_scene = v;
+
+			if (true == message_box.check_end()) {
+				ev_scene = v;
+				z_common();
+			}
+			else {
+				message_box.show_all_text();
+			}
 		}
 	}
 
+	void z_common() {
+
+		message_box.reset();
+	}
+
 	void end() {
+
+		end_common();
+
+		player.set_speed_x_zero();
+	}
+
+	void end_common() {
 
 		ev_scene = 0;
 
@@ -1863,13 +1952,77 @@ private:
 
 		scene = U"game";
 
-		player.set_speed_x_zero();
-
 		ev_shop = false;
 	}
 
-	void next() { ev_scene++; }
-	void next(int v) { ev_scene = v; }
+	void pass() {
+
+		end_common();
+	}
+
+	void change_bg(String set_bg) {
+
+		change_bg_common(set_bg);
+	}
+
+	void change_bgm(String set_bgm) {
+
+		stop_bgm();
+		play_bgm(set_bgm);
+	}
+
+	void change_bg_and_bgm(String set_bg,String set_bgm) {
+
+		change_bg_common(set_bg);
+		fade_scene_bgm = set_bgm;
+	}
+
+	void change_bg_common(String set_bg) {
+
+		initialize_fade_long();
+		fade_scene_type = U"bg";
+		fade_scene_bg = set_bg;
+
+	}
+
+	void reset_ev_image() {
+
+		//特殊処理
+		ev_image = false;
+		ev_image_name = U"";
+		ev_alpha = 0;
+	}
+
+	void next() {
+		ev_scene++;
+		message_box.reset();
+	}
+	void next(int v) {
+		ev_scene = v;
+		message_box.reset();
+	}
+
+	float ev_wait_count = 0;
+
+	void wait(float v) {
+
+		ev_wait_count += Delta_Time;
+
+		if (ev_wait_count > v) {
+			next();
+			ev_wait_count = 0;
+		}
+	}
+
+	void set_var(String name,int v) {
+
+		event_super.set_var(name, v);
+	}
+
+	int get_var(String name) {
+
+		return event_super.get_var(name);
+	}
 
 	void go_area(String go_name,int x,int y) {
 
@@ -1886,15 +2039,53 @@ private:
 	void go_area_common(String go_name, int x, int y) {
 
 		initialize_fade();
+		go_area_core(go_name, x, y);
+	}
+
+	void go_area_long_and_direction_and_color(String go_name, int x, int y, String direction, String color) {
+
+		go_area_common_long(go_name, x, y);
+		fade_scene_direction = direction;
+		fade_scene_color = color;
+
+	}
+
+	void go_area_common_long(String go_name, int x, int y) {
+
+		initialize_fade_long();
+		go_area_core(go_name, x, y);
+	}
+
+	void go_area_core(String go_name, int x, int y) {
+
 		fade_scene_type = U"area";
 		fade_scene_go_area = go_name;
-		fade_scene_go_area_pos = { x * 72,y * 72 };
+		fade_scene_go_area_pos = { x * 72,((y + 1) * 72) };
+
+	
 	}
+
+
+	
+
+
 
 	void set_bg(String set_bg) {
 		ev_bg = set_bg;
 	}
 
+	void clear_bg() {
+		ev_bg = U"";
+	}
+
+	bool ev_image = false;
+	String ev_image_name = U"";
+	int ev_image_x = 0;
+	int ev_image_y = 0;
+	float ev_alpha = 0;
+
+	bool ev_plus_text = false;
+	String ev_plus_text_text = U"";
 
 	//Event関数
 
@@ -1916,8 +2107,43 @@ private:
 	void ev_down_fifth();
 	void ev_down_sixth();
 
+	void ev_down_under();
+	void ev_up_rooftop();
+
+
+
 	void ev_enter_first_toilet();
 	void ev_exit_first_toilet();
+	void ev_enter_second_toilet();
+	void ev_exit_second_toilet();
+	void ev_enter_third_toilet();
+	void ev_exit_third_toilet();
+	void ev_enter_fourth_toilet();
+	void ev_exit_fourth_toilet();
+	void ev_enter_fifth_toilet();
+	void ev_exit_fifth_toilet();
+	void ev_enter_sixth_toilet();
+	void ev_exit_sixth_toilet();
+
+	void ev_enter_okaken();
+	void ev_exit_okaken();
+
+	void ev_enter_bunngei();
+	void ev_exit_bunngei();
+
+	void ev_enter_sinnbun();
+	void ev_exit_sinnbun();
+
+	void ev_enter_housou();
+	void ev_exit_housou();
+
+	void ev_enter_tennmon();
+	void ev_exit_tennmon();
+
+	void ev_enter_enngeki();
+	void ev_exit_enngeki();
+
+
 
 	void ev_goback_world_A_1();
 	void ev_go_world_A_2();
@@ -1933,6 +2159,7 @@ private:
 	//Story
 	void ev_story_1();
 
+	void ev_story_2();
 
 
 
@@ -2061,12 +2288,24 @@ private:
 
 	void initialize_fade();
 
+	void initialize_fade_long();
+
+	void initialize_fade_common();
+
+
+	void function_fade_game_over();
+	void fuction_fade_scene();
+	void function_fade_area();
+	void function_fade_bg();
+
+
 
 	bool fade_scene_on = false;
 
 	int fade_scene = 0;
 	float fade_scene_alpha = 0;
 	float fade_scene_count = 0;
+	float fade_change_time = 0.3;
 
 
 	String fade_scene_type = U"";
@@ -2074,7 +2313,7 @@ private:
 	String fade_scene_go_scene = U"";
 
 	String fade_scene_go_area = U"";
-	Vec2 fade_scene_go_area_pos = { 0,0 };
+	Point fade_scene_go_area_pos = { 0,0 };
 
 	String fade_scene_direction = U"";
 
@@ -2082,6 +2321,14 @@ private:
 	int fade_go_scene_plus_layer = 0;
 	String fade_go_scene_plus_scene = U"";
 
+	String fade_scene_bg = U"";
+
+	String fade_scene_bgm = U"none";
+
+	String fade_scene_se = U"none";
+
+	String fade_scene_color = U"black";
+	
 
 	//Shader
 
@@ -2213,8 +2460,9 @@ private:
 
 		se_locks.push_back(Se_Lock(set_name));
 
-		String adress = U"music/se/" + set_name + U".mp3";
+		String adress = U"se/" + set_name + U".mp3";
 		AudioAsset::Register(set_name, adress);
+		AudioAsset::Load(set_name);
 
 	}
 
@@ -2229,8 +2477,10 @@ private:
 	void update_se_main();
 	void play_se_main();
 
-	
+
+	String bgm_name = U"";
 	void play_bgm(String);
+
 
 	void stop_bgm();
 
@@ -2301,16 +2551,32 @@ private:
 	String back_base_name = U"normal";
 	void draw_back_base()const {
 
-		String image_name = U"back_base_" + back_base_name;
+		if (back_base_name != U"world") {
 
-		TextureAsset(image_name).draw(0, 0);
+			String image_name = U"back_base_" + back_base_name;
+
+			TextureAsset(image_name).draw(0, 0);
+		}
 	}
 
+	//Blue
+	bool world_blue = false;
 
 	//Title
 
 	void update_title();
 	void draw_title()const;
+
+	Cur title_cur;
+	Cur title_cur_2;
+
+
+	int title_scene = 1000;
+	int title_go =-1;
+	bool title_selected = false;
+	float title_wait = 0;
+	
+
 
 	//Respawn
 	struct Respawn_Point {
@@ -2331,24 +2597,125 @@ private:
 
 				if (rect.intersects(player.get_rect())) {
 					respawn_point.area = area;
-					respawn_point.x = object.get_pos().x;
-					respawn_point.y = object.get_pos().y;
+					respawn_point.x = object.get_pos().x + 3;
+					respawn_point.y = object.get_pos().y + 4;
 					break;
 				}
 			}
+			
 		}
 	}
 
+
+	//死亡時にリトライ
 	void respawn() {
 
 		area = respawn_point.area;
-		int x = (respawn_point.x + 3) * 72 - player.get_rect().w / 2;
-		int y = (respawn_point.y + 4) * 72;
+		int x = (respawn_point.x) * 72 - player.get_rect().w / 2;
+		int y = (respawn_point.y ) * 72;
 	
 		player.set_ground_pos(x, y);
+		player.set_is_ground(true);
 	}
 
 	void retry();
 
 
+	//Save
+	void save_game() {
+
+		//つづきからにする
+		status.set_first_used();
+
+		//再開場所を設定
+		status.set_restart_point(area, ev_x, ev_y);
+
+		//進行状況を保存
+
+		//Event
+		{
+
+			String adress = U"save_data/event_super.bin";
+
+			// バイナリファイルをオープン
+			Serializer<BinaryWriter> writer{ adress };
+
+			if (not writer) // もしオープンに失敗したら
+			{
+				throw Error{ U"Failed to open" + adress };
+			}
+
+			// シリアライズに対応したデータを記録
+			writer(event_super);
+
+		}
+
+		//ステータス
+		{
+
+			String adress = U"save_data/status.bin";
+
+			// バイナリファイルをオープン
+			Serializer<BinaryWriter> writer{ adress };
+
+			if (not writer) // もしオープンに失敗したら
+			{
+				throw Error{ U"Failed to open" + adress };
+			}
+
+			// シリアライズに対応したデータを記録
+			writer(status);
+
+		}
+
+
+
+	}
+
+	//Load
+
+	void load_game() {
+
+		//Event
+		{
+
+			String adress = U"save_data/event_super.bin";
+
+			// バイナリファイルをオープン
+			Deserializer<BinaryReader> reader{ adress };
+
+			if (not reader) // もしオープンに失敗したら
+			{
+				throw Error{ U"Failed to open" + adress };
+			}
+
+			// バイナリファイルからシリアライズ対応型のデータを読み込む
+			// （Array は自動でリサイズが行われる）
+			reader(event_super);
+
+		}
+
+		//ステータス
+		{
+
+			String adress = U"save_data/status.bin";
+
+			// バイナリファイルをオープン
+			Deserializer<BinaryReader> reader{ adress };
+
+			if (not reader) // もしオープンに失敗したら
+			{
+				throw Error{ U"Failed to open" + adress };
+			}
+
+			// バイナリファイルからシリアライズ対応型のデータを読み込む
+			// （Array は自動でリサイズが行われる）
+			reader(status);
+
+		}
+	}
+
+	void start_game();
+
+	void reset_save_data();
 };

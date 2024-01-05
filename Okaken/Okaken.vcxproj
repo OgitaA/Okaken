@@ -49,16 +49,16 @@
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\Debug\Intermediate\</IntDir>
     <TargetName>$(ProjectName)(debug)</TargetName>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)App</LocalDebuggerWorkingDirectory>
-    <IncludePath>$(SIV3D_0_6_12)\include;$(SIV3D_0_6_12)\include\ThirdParty;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SIV3D_0_6_12)\lib\Windows;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SIV3D_0_6_13)\include;$(SIV3D_0_6_13)\include\ThirdParty;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_0_6_13)\lib\Windows;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Intermediate\$(ProjectName)\Release\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\Release\Intermediate\</IntDir>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)App</LocalDebuggerWorkingDirectory>
-    <IncludePath>$(SIV3D_0_6_12)\include;$(SIV3D_0_6_12)\include\ThirdParty;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SIV3D_0_6_12)\lib\Windows;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SIV3D_0_6_13)\include;$(SIV3D_0_6_13)\include\ThirdParty;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_0_6_13)\lib\Windows;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -123,6 +123,7 @@
     <ClCompile Include="My_Effect.cpp" />
     <ClCompile Include="Register_Tiles.cpp" />
     <ClCompile Include="Shop.cpp" />
+    <ClCompile Include="Stick.cpp" />
     <ClCompile Include="Update_Ev.cpp" />
     <ClCompile Include="Game_Manager.cpp" />
     <ClCompile Include="Initialize.cpp" />
@@ -346,37 +347,29 @@
     <ClInclude Include="Cur.hpp" />
     <ClInclude Include="Dash_Effect.hpp" />
     <ClInclude Include="Deco.hpp" />
-    <ClInclude Include="Detail_Setter.hpp" />
-    <ClInclude Include="Equip_Charm.hpp" />
     <ClInclude Include="Event.hpp" />
     <ClInclude Include="Event_List.hpp" />
     <ClInclude Include="Event_Super.hpp" />
-    <ClInclude Include="Have_Charm.hpp" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Define.hpp" />
-    <ClInclude Include="Editor_Grid.hpp" />
     <ClInclude Include="Enemy.hpp" />
     <ClInclude Include="Enemy_list.hpp" />
     <ClInclude Include="Game_Manager.hpp" />
-    <ClInclude Include="Have_Item.hpp" />
     <ClInclude Include="Hitotume.hpp" />
     <ClInclude Include="Indent_Drawer.hpp" />
     <ClInclude Include="Item.hpp" />
     <ClInclude Include="Jump_Effect.hpp" />
     <ClInclude Include="Kasa.hpp" />
     <ClInclude Include="Light_Bloom.hpp" />
-    <ClInclude Include="LoadDivGragh.cpp" />
     <ClInclude Include="Memo.hpp" />
     <ClInclude Include="Message_Box.hpp" />
     <ClInclude Include="Move_Floor.hpp" />
-    <ClInclude Include="My_Button.hpp" />
     <ClInclude Include="My_Effect.hpp" />
-    <ClInclude Include="My_Slider.hpp" />
+    <ClInclude Include="My_GUI.hpp" />
     <ClInclude Include="One_Way_Floor.hpp" />
+    <ClInclude Include="Parts.hpp" />
     <ClInclude Include="Player.hpp" />
-    <ClInclude Include="Area_Selecter.hpp" />
     <ClInclude Include="Red_Effect.hpp" />
-    <ClInclude Include="Select_Box.hpp" />
     <ClInclude Include="Slip_Block.hpp" />
     <ClInclude Include="Stage_Data.hpp" />
     <ClInclude Include="Status.hpp" />
@@ -386,7 +379,6 @@
     <ClInclude Include="Text_Data.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="Needle.hpp" />
-    <ClInclude Include="Tool_Selecter.hpp" />
     <ClInclude Include="Tyoutin.hpp" />
     <ClInclude Include="White_Effect.hpp" />
   </ItemGroup>

@@ -26,7 +26,7 @@ public:
 		
 
 			// 改行文字なら
-			if (glyph.codePoint == U'\n' or my_indent_v <= my_wide)
+			if (glyph.codePoint == U'\n')
 			{
 				//幅リセット
 				my_wide = 0;
@@ -50,6 +50,17 @@ public:
 			//移動した分カウント
 			my_wide += glyph.xAdvance;
 
+			if (my_indent_v <= my_wide) {
+
+				//幅リセット
+				my_wide = 0;
+
+				// ペンの X 座標をリセット
+				penPos.x = basePos.x;
+
+				// ペンの Y 座標をフォントの高さ分進める+補助
+				penPos.y += font.height() + plus_h;
+			}
 			
 		}
 	}

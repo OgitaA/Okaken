@@ -168,7 +168,79 @@ void Game_Manager::make_stage() {
 		throw Error{ U"you_are_lost_in_null_area!!" };
 	}
 
+	items.clear();
+	my_effects.clear();
+
+	//エリアが画面より狭い場合、背景を黒にする。
+	bool back_black = false;
+
+	if (area_wide < 1920) {
+		back_black = true;
+	}
+
+	if (false == back_black) {
+		make_stage_back();
+	}
+	else {
+		world_blue = false;
+		back_base_name = U"black";
+	}
+
+
 	make_stage_plus();
+}
+
+void Game_Manager::make_stage_back() {
+
+	//所属しているzoneを探す
+	String zone = U"";
+
+	for (auto& data : area_datas) {
+
+		if (data.name == area) {
+			zone = data.belong_zone;
+			break;
+		}
+	}
+
+	//通常の廊下
+	back_base_name = U"normal";
+	world_blue = false;
+
+
+	bool is_zone = false;
+
+	
+	if (U"world_A" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_B" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_C" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_D" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_E" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_F" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_G" == zone) {
+		is_zone = true;
+	}
+	else if (U"world_H" == zone) {
+		is_zone = true;
+	}
+
+	if (true == is_zone) {
+
+		back_base_name = U"world";
+		world_blue = true;
+	}
 }
 
 void Game_Manager::make_stage_plus() {
@@ -200,9 +272,11 @@ void Game_Manager::make_stage_plus() {
 
 		special_objects.push_back(Special_Object(U"board_4", 11, 2, U"green"));
 
-		special_objects.push_back(Special_Object(U"soul", 13, 8, U"green"));
+		special_objects.push_back(Special_Object(U"soul", 13, 7, U"green"));
 
+		special_objects.push_back(Special_Object(U"board_5", 72, 2, U"green"));
+		special_objects.push_back(Special_Object(U"board_5", 82, 2, U"green"));
 
-		
+		special_objects.push_back(Special_Object(U"mirror", 99, 5, U"green"));
 	}
 }
